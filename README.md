@@ -22,7 +22,17 @@ Open `index.html` in a modern browser (Chrome, Edge, Firefox or Safari). Double-
 - **Dashed ? while the boss stretches** (only after 70%): this is a bluff. The boss will not turn.
 - Three strikes ends the game with a meeting with HR. If the clock gets to 5 pm first, you are clocked out.
 
-A round lasts 75 seconds. The boss gets less predictable as the meter fills: 0–30% is easy, 30–70% is medium, and 70–100% is hard. You get a rank (S, A, B or C) when you win. Your best result and your sound setting are saved in `localStorage`.
+Pick a level on the title screen:
+
+| Level | Difficulty | Workday | What changes |
+|---|---|---|---|
+| Friday | Easy | 85 s | Long distractions, slow turns, rare bluffs |
+| Wednesday | Normal | 75 s | The original balance |
+| Monday | Hard | 62 s | Short distractions, quick turns, frequent bluffs |
+
+Within each level, the boss gets less predictable as the meter fills (0–30%, 30–70%, 70–100%). You get a rank (S, A, B or C) when you win. Scores scale time left to a 75-second day and add a bonus on harder levels, so scores compare across levels. Your best result for each level, your level choice and your sound setting are saved in `localStorage`.
+
+To tune or add a level, edit `LEVELS` and `LEVEL_ORDER` in `js/config.js`.
 
 ## Project structure
 
@@ -49,7 +59,7 @@ The scripts are plain `<script>` tags, not ES modules. Browsers block modules on
 ## Notes
 
 - Plain HTML, CSS and JavaScript. The graphics are inline SVG and the sounds come from the Web Audio API. There are no external assets or dependencies.
-- Romance fills at 3.75% per second. The spec's starting value of 2% per second made the round too hard.
+- On Wednesday, romance fills at 3.75% per second. The spec's starting value of 2% per second made the round too hard. The levels were tuned with a simulation of an attentive player.
 - The game respects `prefers-reduced-motion`. It pauses when the tab is hidden or loses focus, and it clears held keys so no input gets stuck.
 
 ## Customise

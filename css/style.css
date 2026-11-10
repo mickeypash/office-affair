@@ -169,10 +169,25 @@ kbd {
 }
 .title span { display: block; }
 .title span:last-child { margin-left: .4em; color: var(--pink-soft); text-shadow: 6px 6px 0 var(--ink); }
-.subtitle { margin: 22px 0 22px; font-size: clamp(18px, 2vw, 22px); font-style: italic; color: var(--pink-soft); }
-.howto { margin: 0 0 26px; padding: 0; list-style: none; display: grid; gap: 10px; font-size: 16px; line-height: 1.4; color: rgba(255,255,255,.92); max-width: 42ch; }
+.subtitle { margin: 20px 0 16px; font-size: clamp(18px, 2vw, 22px); font-style: italic; color: var(--pink-soft); }
+.howto { margin: 0 0 20px; padding: 0; list-style: none; display: grid; gap: 10px; font-size: 16px; line-height: 1.4; color: rgba(255,255,255,.92); max-width: 42ch; }
 .howto li { display: grid; grid-template-columns: 30px 1fr; align-items: start; gap: 8px; }
 .howto svg { width: 26px; height: 26px; }
+.levels { display: flex; gap: 8px; margin: 0 0 8px; padding: 0; border: 0; }
+.level { position: relative; flex: 1; max-width: 140px; cursor: pointer; }
+.level input { position: absolute; opacity: 0; inset: 0; margin: 0; cursor: pointer; }
+.level span { display: block; text-align: center; }
+.level .lv-day {
+  padding: 8px 6px 2px; border: 3px solid var(--ink); border-bottom: 0; border-radius: 14px 14px 0 0;
+  background: rgba(255,255,255,.14); font-family: var(--font-display); font-size: 17px;
+}
+.level .lv-diff {
+  padding: 0 6px 7px; border: 3px solid var(--ink); border-top: 0; border-radius: 0 0 14px 14px;
+  background: rgba(255,255,255,.14); font-size: 13px; font-weight: 800; color: rgba(255,255,255,.75);
+}
+.level input:checked ~ span { background: var(--paper); color: var(--ink); }
+.level input:focus-visible ~ .lv-day { outline: 4px solid var(--gold); outline-offset: 2px; }
+.level-blurb { margin: 0 0 18px; min-height: 1.4em; font-size: 15px; font-style: italic; color: rgba(255,255,255,.75); }
 .menu-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
 .btn {
   border: 4px solid var(--ink); border-radius: 999px; padding: 12px 26px;
@@ -262,8 +277,21 @@ kbd {
   #customise { align-items: flex-end; padding: 8px; }
   .cust-panel { width: 100%; max-height: 46dvh; padding: 14px; }
   .cust-title { font-size: 22px; margin-bottom: 8px; }
-  #menu { align-items: flex-end; padding: 5vh 6vw 6vh; background: linear-gradient(0deg, rgba(43,35,64,.97) 0%, rgba(43,35,64,.9) 52%, rgba(43,35,64,0) 78%); }
-  .howto { font-size: 15px; }
+  #menu {
+    align-items: safe flex-end; overflow-y: auto; padding: 3vh 6vw 4vh;
+    background: linear-gradient(0deg, rgba(43,35,64,.97) 0%, rgba(43,35,64,.93) 66%, rgba(43,35,64,.35) 90%);
+  }
+  .title { font-size: clamp(44px, 13vw, 84px); }
+  .subtitle { margin: 14px 0 12px; font-size: 17px; }
+  .howto { font-size: 14px; gap: 7px; margin-bottom: 16px; }
+  .howto li { grid-template-columns: 24px 1fr; }
+  .howto svg { width: 22px; height: 22px; }
+  .level .lv-day { font-size: 15px; }
+  .level-blurb { margin-bottom: 14px; font-size: 14px; }
+  .btn { font-size: 18px; }
+  .btn.primary { font-size: 22px; padding: 11px 30px; }
+  .btn.small { font-size: 15px; padding: 8px 14px; }
+  .best { margin-top: 12px; }
 }
 @media (max-width: 600px) {
   #hud { gap: 6px; }
