@@ -40,6 +40,7 @@ class Game {
     this.resumeTo = this.state;
     this.setState(S.PAUSED);
     player.clear();
+    $('pauseTo').textContent = cast.fullName('player');
     ui.showOverlay('pause');
   }
   resume() {

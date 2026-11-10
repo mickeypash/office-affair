@@ -85,15 +85,17 @@ const ui = {
     if (v === 'GO!') setTimeout(() => { if (span.parentNode) span.remove(); }, 900);
   },
   showOverlay(name) {
-    ['menu', 'pause', 'result'].forEach(n => this.el[n].classList.toggle('show', n === name));
-    const focusMap = { menu: 'btnPlay', pause: 'btnResume', result: 'btnAgain' };
-    if (name && focusMap[name]) setTimeout(() => this.el[focusMap[name]].focus({ preventScroll: true }), 30);
+    ['menu', 'pause', 'result', 'customise'].forEach(n => $(n).classList.toggle('show', n === name));
+    document.body.classList.toggle('customising', name === 'customise');
+    if (typeof layout === 'function') layout();
+    const focusMap = { menu: 'btnPlay', pause: 'btnResume', result: 'btnAgain', customise: 'tabPlayer' };
+    if (name && focusMap[name]) setTimeout(() => $(focusMap[name]).focus({ preventScroll: true }), 30);
   },
   showResult(r) {
     const e = this.el;
     const rows = [];
     if (r.kind === 'win') {
-      e.resultHead.innerHTML = '<div><b>TO:</b> Jules Park &amp; Remy Okafor</div><div><b>FROM:</b> Department of Hearts</div><div><b>RE:</b> Performance review</div>';
+      e.resultHead.innerHTML = `<div><b>TO:</b> ${esc(cast.fullName('player'))} &amp; ${esc(cast.fullName('partner'))}</div>` + '<div><b>FROM:</b> Department of Hearts</div><div><b>RE:</b> Performance review</div>';
       e.resultTitle.textContent = 'LOVE PROMOTION! 💘';
       e.resultSub.textContent = 'Your romance has excellent quarterly results.';
       e.resultRank.innerHTML = `${r.rank}: ${r.title}` + (r.newBest ? '<span class="newbest">New best</span>' : '');
@@ -102,7 +104,7 @@ const ui = {
       if (r.best) rows.push(['Best result', `${r.best.rank}, ${r.best.score} pts`]);
       e.resultStamp.textContent = 'APPROVED'; e.resultStamp.className = 'stamp';
     } else if (r.kind === 'hr') {
-      e.resultHead.innerHTML = '<div><b>TO:</b> Jules Park</div><div><b>FROM:</b> Human Resources</div><div><b>RE:</b> Mandatory meeting, 9 am</div>';
+      e.resultHead.innerHTML = `<div><b>TO:</b> ${esc(cast.fullName('player'))}</div>` + '<div><b>FROM:</b> Human Resources</div><div><b>RE:</b> Mandatory meeting, 9 am</div>';
       e.resultTitle.textContent = 'MEETING WITH HR 📋';
       e.resultSub.textContent = 'Your workplace conduct is under review.';
       e.resultRank.style.display = 'none';

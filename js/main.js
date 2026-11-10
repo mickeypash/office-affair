@@ -3,6 +3,7 @@
 const renderer = new Renderer();
 const game = new Game();
 ui.init();
+customise.init();
 confetti.init();
 
 function layout() {
@@ -20,7 +21,10 @@ function layout() {
   document.documentElement.style.setProperty('--stage-w', Math.floor(w) + 'px');
   document.documentElement.style.setProperty('--stage-h', Math.floor(h) + 'px');
   const vbW = clamp(900 * aspect, 900, 1600), vbH = vbW / aspect;
-  $('scene').setAttribute('viewBox', `${(800 - vbW / 2).toFixed(1)} ${(900 - vbH).toFixed(1)} ${vbW.toFixed(1)} ${vbH.toFixed(1)}`);
+  // Portrait + Customise sheet open: scroll the scene so the faces sit above the sheet.
+  const liftForSheet = document.body.classList.contains('customising') && vbH > 900;
+  const vbY = liftForSheet ? 40 : 900 - vbH;
+  $('scene').setAttribute('viewBox', `${(800 - vbW / 2).toFixed(1)} ${vbY.toFixed(1)} ${vbW.toFixed(1)} ${vbH.toFixed(1)}`);
   confetti.resize();
 }
 window.addEventListener('resize', layout);
@@ -38,11 +42,12 @@ window.addEventListener('keydown', e => {
     if (!e.repeat) player.press(isSpace ? 'key:space' : 'key:shift');
     return;
   }
-  if (e.key === 'Escape' || e.key === 'p' || e.key === 'P') {
+  if (e.key === 'Escape' && customise.isOpen) { e.preventDefault(); customise.close(); return; }
+  if (e.key === 'Escape' || ((e.key === 'p' || e.key === 'P') && !(e.target instanceof HTMLInputElement))) {
     if (gameplayInput()) { e.preventDefault(); game.pause(); }
     else if (game.state === S.PAUSED) { e.preventDefault(); game.resume(); }
   }
-  if (e.key === 'Enter' && game.state === S.MENU && document.activeElement === document.body) { e.preventDefault(); game.start(); }
+  if (e.key === 'Enter' && game.state === S.MENU && !customise.isOpen && document.activeElement === document.body) { e.preventDefault(); game.start(); }
 });
 window.addEventListener('keyup', e => {
   const isSpace = e.code === 'Space' || e.key === ' ';

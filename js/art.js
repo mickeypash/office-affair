@@ -88,39 +88,85 @@ function coworkerHands(o) {
   </g>`;
 }
 
-const JULES = {
-  dir: 1, skin: '#C98A5E', top: '#E9B44C', sleeve: '#E9B44C',
-  outfit: `
+/* ---- Customisable parts. Each builder takes colours and returns SVG. ---- */
+// Hair is drawn in head space (head centre = 0,0, radius 70).
+// "back" goes behind the face, "front" goes over the forehead.
+const HAIR_ART = {
+  curls: {
+    back: h => `<g fill="${h}" ${SW(6)}>
+      <circle cx="-62" cy="-30" r="30"/><circle cx="-42" cy="-60" r="30"/><circle cx="-12" cy="-78" r="30"/><circle cx="20" cy="-76" r="30"/>
+      <circle cx="48" cy="-58" r="30"/><circle cx="64" cy="-28" r="29"/><circle cx="-74" cy="0" r="22"/><circle cx="74" cy="0" r="22"/></g>`,
+    front: h => `<g fill="${h}" ${SW(5)}>
+      <circle cx="-40" cy="-54" r="20"/><circle cx="-10" cy="-64" r="22"/><circle cx="22" cy="-62" r="21"/><circle cx="48" cy="-46" r="16"/></g>`,
+  },
+  bun: {
+    back: h => `<circle cx="0" cy="-86" r="30" fill="${h}" ${SW(6)}/>
+      <rect x="-18" y="-64" width="36" height="11" rx="5" fill="#FF4F86" ${SW(4)}/>
+      <path d="M-78,20 C-86,-58 -46,-84 0,-84 C46,-84 86,-58 78,20 Z" fill="${h}" ${SW(6)}/>`,
+    front: h => `<path d="M-68,-14 C-62,-62 -12,-84 40,-66 C64,-56 74,-32 68,-6 C52,-40 22,-50 -8,-44 C-36,-40 -56,-30 -68,-14 Z" fill="${h}" ${SW(5)}/>`,
+  },
+  bob: {
+    back: h => `<path d="M-84,44 C-92,-62 -50,-88 0,-88 C50,-88 92,-62 84,44 Q70,56 56,40 L-56,40 Q-70,56 -84,44 Z" fill="${h}" ${SW(6)}/>`,
+    front: h => `<path d="M-70,-16 C-68,-70 -32,-84 0,-84 C32,-84 68,-70 70,-16 Q36,-36 0,-34 Q-36,-36 -70,-16 Z" fill="${h}" ${SW(5)}/>`,
+  },
+  crop: {
+    back: h => `<path d="M-72,0 C-80,-66 -40,-86 0,-86 C40,-86 80,-66 72,0 Q66,-26 50,-36 L-50,-36 Q-66,-26 -72,0 Z" fill="${h}" ${SW(6)}/>`,
+    front: h => `<path d="M-62,-34 C-52,-78 10,-94 52,-66 C66,-56 70,-42 68,-30 C42,-58 -18,-62 -62,-34 Z" fill="${h}" ${SW(5)}/>`,
+  },
+  long: {
+    back: h => `<path d="M-86,134 L-86,-8 C-92,-72 -48,-92 0,-92 C48,-92 92,-72 86,-8 L86,134 Q66,146 52,126 L52,30 L-52,30 L-52,126 Q-66,146 -86,134 Z" fill="${h}" ${SW(6)}/>`,
+    front: h => `<path d="M-70,-4 C-72,-66 -32,-86 0,-86 C32,-86 72,-66 70,-4 C58,-40 30,-58 4,-60 L0,-48 L-4,-60 C-30,-58 -58,-40 -70,-4 Z" fill="${h}" ${SW(5)}/>`,
+  },
+  shaved: {
+    back: () => '',
+    front: h => `<path d="M-68,-18 C-64,-70 -30,-76 0,-76 C30,-76 64,-70 68,-18 C42,-48 -42,-48 -68,-18 Z" fill="${h}" opacity=".6"/>`,
+  },
+};
+
+// Outfits are drawn in body space (hip = 0,0). "sleeve" is the arm colour.
+const OUTFIT_ART = {
+  cardigan: {
+    sleeve: c => c,
+    svg: c => `
     <path d="M-34,-190 L0,-150 L34,-190 Z" fill="#FFFFFF" ${SW(5)}/>
     <path d="M0,-150 L0,80" ${SW(5)}/>
     <circle cx="14" cy="-112" r="5" fill="${INK}"/><circle cx="14" cy="-66" r="5" fill="${INK}"/><circle cx="14" cy="-20" r="5" fill="${INK}"/>
-    <path d="M-80,-60 h40 v26 h-40 Z" fill="#E0A63C" ${SW(4)}/>
+    <path d="M-80,-60 h40 v26 h-40 Z" fill="${shade(c, -0.12)}" ${SW(4)}/>
     <path d="M-66,-60 v-14" stroke="#FF4F86" stroke-width="5" stroke-linecap="round"/>`,
-  hairBack: `<g fill="#3A2730" ${SW(6)}>
-      <circle cx="-62" cy="-30" r="30"/><circle cx="-42" cy="-60" r="30"/><circle cx="-12" cy="-78" r="30"/><circle cx="20" cy="-76" r="30"/>
-      <circle cx="48" cy="-58" r="30"/><circle cx="64" cy="-28" r="29"/><circle cx="-74" cy="0" r="22"/><circle cx="74" cy="0" r="22"/>
-    </g>`,
-  hairFront: `<g fill="#3A2730" ${SW(5)}>
-      <circle cx="-40" cy="-54" r="20"/><circle cx="-10" cy="-64" r="22"/><circle cx="22" cy="-62" r="21"/><circle cx="48" cy="-46" r="16"/>
-    </g>`,
-  glassesFront: `<g fill="#fff" fill-opacity=".18" ${SW(4)}>
-      <circle cx="-26" cy="0" r="20"/><circle cx="26" cy="0" r="20"/><path d="M-6,-2 Q0,-7 6,-2" fill="none"/>
-    </g>`,
-  glassesProfile: `<g fill="#fff" fill-opacity=".18" ${SW(4)}><circle cx="30" cy="0" r="20"/><path d="M10,-2 L-30,-6" fill="none"/></g>`,
-};
-const REMY = {
-  dir: -1, skin: '#F2C3A0', top: '#3E9C92', sleeve: '#F3F0FA',
-  outfit: `
+  },
+  vest: {
+    sleeve: () => '#F3F0FA',
+    svg: c => `
     <path d="M-44,-190 L0,-118 L44,-190 Z" fill="#F3F0FA" ${SW(5)}/>
     <path d="M-30,-190 L-12,-174 L0,-186 L12,-174 L30,-190" fill="#FFFFFF" ${SW(4)}/>
     <path d="M-8,-182 L8,-182 L12,-140 L0,-124 L-12,-140 Z" fill="#FF4F86" ${SW(4)}/>
-    <g fill="#53B2A7"><path d="M-70,-90 l14,-18 l14,18 l-14,18 Z"/><path d="M56,-90 l14,-18 l14,18 l-14,18 Z"/><path d="M-70,-30 l14,-18 l14,18 l-14,18 Z"/><path d="M56,-30 l14,-18 l14,18 l-14,18 Z"/></g>`,
-  hairBack: `
-    <circle cx="0" cy="-86" r="30" fill="#E0773D" ${SW(6)}/>
-    <rect x="-18" y="-64" width="36" height="11" rx="5" fill="#FF4F86" ${SW(4)}/>
-    <path d="M-78,20 C-86,-58 -46,-84 0,-84 C46,-84 86,-58 78,20 Z" fill="#E0773D" ${SW(6)}/>`,
-  hairFront: `<path d="M-68,-14 C-62,-62 -12,-84 40,-66 C64,-56 74,-32 68,-6 C52,-40 22,-50 -8,-44 C-36,-40 -56,-30 -68,-14 Z" fill="#E0773D" ${SW(5)}/>`,
+    <g fill="${shade(c, 0.14)}"><path d="M-70,-90 l14,-18 l14,18 l-14,18 Z"/><path d="M56,-90 l14,-18 l14,18 l-14,18 Z"/><path d="M-70,-30 l14,-18 l14,18 l-14,18 Z"/><path d="M56,-30 l14,-18 l14,18 l-14,18 Z"/></g>`,
+  },
+  turtleneck: {
+    sleeve: c => c,
+    svg: c => `
+    <rect x="-34" y="-206" width="68" height="30" rx="13" fill="${shade(c, -0.1)}" ${SW(5)}/>
+    <path d="M-20,-200 v18 M-7,-202 v22 M7,-202 v22 M20,-200 v18" stroke="${shade(c, -0.25)}" stroke-width="3" stroke-linecap="round"/>
+    <path d="M-60,-120 Q0,-106 60,-120" fill="none" stroke="${shade(c, -0.12)}" stroke-width="5" stroke-linecap="round"/>`,
+  },
 };
+
+const GLASSES_FRONT = `<g fill="#fff" fill-opacity=".18" ${SW(4)}>
+  <circle cx="-26" cy="0" r="20"/><circle cx="26" cy="0" r="20"/><path d="M-6,-2 Q0,-7 6,-2" fill="none"/></g>`;
+const glassesProfile = d => `<g fill="#fff" fill-opacity=".18" ${SW(4)}>
+  <circle cx="${30 * d}" cy="0" r="20"/><path d="M${10 * d},-2 L${-30 * d},-6" fill="none"/></g>`;
+
+/* Turn a cast member's settings (see DEFAULT_CAST) into options for the builders above. */
+function coworkerOpts(m, dir) {
+  const hair = HAIR_ART[m.hairStyle] || HAIR_ART.curls;
+  const outfit = OUTFIT_ART[m.outfit] || OUTFIT_ART.cardigan;
+  return {
+    dir, skin: m.skin, top: m.outfitColour, sleeve: outfit.sleeve(m.outfitColour),
+    outfit: outfit.svg(m.outfitColour),
+    hairBack: hair.back(m.hair), hairFront: hair.front(m.hair),
+    glassesFront: m.glasses ? GLASSES_FRONT : '', glassesProfile: m.glasses ? glassesProfile(dir) : '',
+  };
+}
 
 function managerSVG() {
   const skin = '#E8B896', hair = '#B3B0C6', blazer = '#4A4560', chair = '#5E527F';
@@ -237,10 +283,3 @@ function walkerSVG() {
     <g id="wCups" transform="translate(0,-262)">${cups}</g>`;
 }
 
-/* Build the characters into the scene */
-$('charL').innerHTML = coworkerBody(JULES);
-$('charR').innerHTML = coworkerBody(REMY);
-$('handsL').innerHTML = coworkerHands(JULES);
-$('handsR').innerHTML = coworkerHands(REMY);
-$('mgrBody').innerHTML = managerSVG();
-$('walker').innerHTML = walkerSVG();
