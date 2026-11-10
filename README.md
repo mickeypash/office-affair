@@ -24,9 +24,29 @@ Open `index.html` in a modern browser (Chrome, Edge, Firefox or Safari). Double-
 
 A round lasts 75 seconds. The boss gets less predictable as the meter fills: 0–30% is easy, 30–70% is medium, and 70–100% is hard. You get a rank (S, A, B or C) when you win. Your best result and your sound setting are saved in `localStorage`.
 
+## Project structure
+
+| File | What it holds |
+|---|---|
+| `index.html` | Page markup: HUD, the SVG office scene, overlays |
+| `css/style.css` | All styles |
+| `js/util.js` | Small helpers and the `localStorage` wrapper |
+| `js/config.js` | Game rules and difficulty tuning |
+| `js/art.js` | SVG builders for the coworkers, boss and walker |
+| `js/audio.js` | Procedural sound effects (Web Audio) |
+| `js/player.js` | Input state (which keys and pointers are held) |
+| `js/manager.js` | The boss's state machine |
+| `js/renderer.js` | Animates the scene every frame |
+| `js/confetti.js` | Win confetti (canvas) |
+| `js/ui.js` | HUD, menus, result memos, toasts |
+| `js/game.js` | Game lifecycle and finite-state machine |
+| `js/main.js` | Boot, layout, input wiring, main loop |
+
+The scripts are plain `<script>` tags, not ES modules. Browsers block modules on pages opened straight from disk, so this keeps double-clicking `index.html` working.
+
 ## Notes
 
-- The game is one file with HTML, CSS and JavaScript only. The graphics are inline SVG and the sounds come from the Web Audio API. There are no external assets.
+- Plain HTML, CSS and JavaScript. The graphics are inline SVG and the sounds come from the Web Audio API. There are no external assets or dependencies.
 - Romance fills at 3.75% per second. The spec's starting value of 2% per second made the round too hard.
 - The game respects `prefers-reduced-motion`. It pauses when the tab is hidden or loses focus, and it clears held keys so no input gets stuck.
 
@@ -36,4 +56,4 @@ A round lasts 75 seconds. The boss gets less predictable as the meter fills: 0�
 
 ## Publishing
 
-`.github/workflows/pages.yml` publishes the game to GitHub Pages on every push to `main`. You can also start it by hand from the **Actions** tab. It publishes only `index.html`.
+`.github/workflows/pages.yml` publishes the game to GitHub Pages on every push to `main`. You can also start it by hand from the **Actions** tab. It publishes only `index.html`, `css/` and `js/`.
