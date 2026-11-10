@@ -12,3 +12,11 @@ const store = {
   get(k, d) { try { const v = localStorage.getItem('officeAffair.' + k); return v == null ? d : JSON.parse(v); } catch (e) { return d; } },
   set(k, v) { try { localStorage.setItem('officeAffair.' + k, JSON.stringify(v)); } catch (e) {} },
 };
+
+/* Lighten (amt > 0) or darken (amt < 0) a #rrggbb colour. */
+const shade = (hex, amt) => {
+  const n = parseInt(hex.slice(1), 16);
+  const ch = [(n >> 16) & 255, (n >> 8) & 255, n & 255].map(v => Math.round(amt < 0 ? v * (1 + amt) : v + (255 - v) * amt));
+  return '#' + ch.map(v => clamp(v, 0, 255).toString(16).padStart(2, '0')).join('');
+};
+const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));

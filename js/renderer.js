@@ -3,10 +3,11 @@
 class Renderer {
   constructor() {
     this.scene = $('scene');
-    this.chars = {
-      L: this.makeChar('charL', 'handsL', 560, 1),
-      R: this.makeChar('charR', 'handsR', 1040, -1),
-    };
+    $('mgrBody').innerHTML = managerSVG();
+    $('walker').innerHTML = walkerSVG();
+    this.chars = {};
+    this.buildChar('L');
+    this.buildChar('R');
     const ids = ['mgrBody', 'mgrBack', 'mgrSide', 'mgrFront', 'actType', 'actCoffee', 'actRead', 'actPhone', 'actStretchArms',
       'elbowL', 'elbowR', 'mug', 'paper', 'mgrLids', 'mgrBrowStern', 'mgrBrowUp', 'mgrMouthFlat', 'mgrMouthO', 'mgrEyes',
       'warnIcon', 'fakeIcon', 'bigBang', 'thought', 'thoughtText', 'thoughtBox', 'cone', 'coneFill', 'coneLine',
@@ -33,6 +34,28 @@ class Renderer {
     }
     this.reset();
   }
+  /* (Re)draw one coworker from the cast settings. L = player, R = partner. */
+  buildChar(k) {
+    const role = k === 'L' ? 'player' : 'partner', dir = k === 'L' ? 1 : -1;
+    const o = coworkerOpts(cast.get(role), dir);
+    $('char' + k).innerHTML = coworkerBody(o);
+    $('hands' + k).innerHTML = coworkerHands(o);
+    const prev = this.chars[k];
+    this.chars[k] = this.makeChar('char' + k, 'hands' + k, k === 'L' ? 560 : 1040, dir);
+    if (prev && prev.pose) this.chars[k].pose = prev.pose;
+    this.updatePlate(k);
+  }
+  updatePlate(k) {
+    const role = k === 'L' ? 'player' : 'partner';
+    const el = $('plate' + k);
+    el.textContent = `${cast.firstName(role)}, ${cast.get(role).team}`;
+    el.removeAttribute('textLength'); el.removeAttribute('lengthAdjust');
+    try {
+      if (el.getComputedTextLength() > 132) { el.setAttribute('textLength', '132'); el.setAttribute('lengthAdjust', 'spacingAndGlyphs'); }
+    } catch (e) { /* not rendered yet */ }
+  }
+  /* Make one coworker look at the other for a moment (used as live feedback when customising). */
+  glanceAt(k) { const c = this.chars[k === 'L' ? 'R' : 'L']; if (c) { c.glancing = 1.4; } }
   makeChar(bodyId, handsId, x, dir) {
     const body = $(bodyId), hands = $(handsId);
     const q = s => body.querySelector(s), qh = s => hands.querySelector(s);

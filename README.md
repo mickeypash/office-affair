@@ -31,14 +31,16 @@ A round lasts 75 seconds. The boss gets less predictable as the meter fills: 0â€
 | `index.html` | Page markup: HUD, the SVG office scene, overlays |
 | `css/style.css` | All styles |
 | `js/util.js` | Small helpers and the `localStorage` wrapper |
-| `js/config.js` | Game rules and difficulty tuning |
-| `js/art.js` | SVG builders for the coworkers, boss and walker |
+| `js/config.js` | Game rules, difficulty tuning, character palettes and default cast |
+| `js/cast.js` | Loads, checks and saves the cast (names and looks) |
+| `js/art.js` | SVG builders for the coworkers, hair styles, outfits, boss and walker |
 | `js/audio.js` | Procedural sound effects (Web Audio) |
 | `js/player.js` | Input state (which keys and pointers are held) |
 | `js/manager.js` | The boss's state machine |
 | `js/renderer.js` | Animates the scene every frame |
 | `js/confetti.js` | Win confetti (canvas) |
 | `js/ui.js` | HUD, menus, result memos, toasts |
+| `js/customise.js` | The Customise screen |
 | `js/game.js` | Game lifecycle and finite-state machine |
 | `js/main.js` | Boot, layout, input wiring, main loop |
 
@@ -49,6 +51,19 @@ The scripts are plain `<script>` tags, not ES modules. Browsers block modules on
 - Plain HTML, CSS and JavaScript. The graphics are inline SVG and the sounds come from the Web Audio API. There are no external assets or dependencies.
 - Romance fills at 3.75% per second. The spec's starting value of 2% per second made the round too hard.
 - The game respects `prefers-reduced-motion`. It pauses when the tab is hidden or loses focus, and it clears held keys so no input gets stuck.
+
+## Customise
+
+Click **Customise** on the title screen. You can change both coworkers:
+
+- name and team (shown on the desk name plates and in the memos)
+- skin tone, hair style (curls, bun, bob, crop, long, shaved) and hair colour
+- outfit (cardigan, vest and tie, turtleneck) and outfit colour
+- glasses
+
+Every colour row also has a colour picker for any colour. Changes appear live in the office behind the panel and are saved in `localStorage`. **Surprise me** picks a random look, and **Reset** restores the default.
+
+To change the defaults or add colours, edit `DEFAULT_CAST` and the palettes in `js/config.js`. To add a hair style or an outfit, add a builder to `HAIR_ART` or `OUTFIT_ART` in `js/art.js` and its label to `HAIR_STYLES` or `OUTFITS` in `js/config.js`.
 
 ## Play online
 

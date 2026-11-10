@@ -233,8 +233,8 @@
           <rect x="488" y="740" width="144" height="38" rx="6" fill="#FFE9B8"/>
           <rect x="968" y="740" width="144" height="38" rx="6" fill="#FFE9B8"/>
         </g>
-        <text x="560" y="766" text-anchor="middle" font-family="ui-rounded, system-ui, sans-serif" font-weight="800" font-size="18" fill="#2B2340" stroke="none">Jules, Accounts</text>
-        <text x="1040" y="766" text-anchor="middle" font-family="ui-rounded, system-ui, sans-serif" font-weight="800" font-size="18" fill="#2B2340" stroke="none">Remy, HR</text>
+        <text id="plateL" x="560" y="766" text-anchor="middle" font-family="ui-rounded, system-ui, sans-serif" font-weight="800" font-size="18" fill="#2B2340" stroke="none">Jules, Accounts</text>
+        <text id="plateR" x="1040" y="766" text-anchor="middle" font-family="ui-rounded, system-ui, sans-serif" font-weight="800" font-size="18" fill="#2B2340" stroke="none">Remy, HR</text>
       </g>
 
       <!-- Desk items -->
@@ -298,7 +298,7 @@
           <line x1="440" y1="640" x2="452" y2="596" stroke-width="7" stroke="#2B2340"/><line x1="440" y1="640" x2="452" y2="596" stroke-width="3" stroke="#FF4F86"/>
           <rect x="418" y="616" width="36" height="40" rx="5" fill="#8ED8C4"/>
         </g>
-        <!-- coffee cup (Jules) -->
+        <!-- coffee cup (player) -->
         <ellipse id="spill" cx="742" cy="664" rx="46" ry="9" fill="#8A5A3C" stroke-width="3" opacity="0"/>
         <g id="cupL">
           <path class="steam" d="M690 606 q-6 -10 0 -20 q6 -10 0 -20" fill="none" stroke="#fff" stroke-width="4" opacity=".7"/>
@@ -307,7 +307,7 @@
           <rect x="680" y="614" width="38" height="42" rx="7" fill="#FFFFFF" stroke-width="5"/>
           <use href="#heartShape" transform="translate(699,638) scale(.55)" fill="#FF4F86" stroke="none"/>
         </g>
-        <!-- paper tray (Remy) -->
+        <!-- paper tray (partner) -->
         <g stroke-width="4">
           <rect x="868" y="632" width="74" height="14" rx="2" fill="#fff" transform="rotate(-3 905 640)"/>
           <rect x="872" y="624" width="74" height="14" rx="2" fill="#fff" transform="rotate(4 905 630)"/>
@@ -389,16 +389,45 @@
     </ul>
     <div class="menu-actions">
       <button class="btn primary" id="btnPlay">Play</button>
+      <button class="btn small" id="btnCustomise">Customise</button>
       <button class="btn small" id="btnSoundMenu" aria-pressed="true">Sound: on</button>
     </div>
     <div class="best" id="bestLine"></div>
   </div>
 </section>
 
+<!-- Customise -->
+<section id="customise" class="overlay" role="dialog" aria-labelledby="custTitle">
+  <div class="cust-panel">
+    <h2 class="cust-title" id="custTitle">Customise</h2>
+    <div class="cust-tabs" role="tablist" aria-label="Who to edit">
+      <button role="tab" id="tabPlayer" data-role="player" aria-selected="true" aria-controls="custBody">You</button>
+      <button role="tab" id="tabPartner" data-role="partner" aria-selected="false" aria-controls="custBody">Your crush</button>
+    </div>
+    <div class="cust-body" id="custBody" role="tabpanel">
+      <div class="cust-row two">
+        <label class="field"><span>Name</span><input id="custName" type="text" maxlength="18" autocomplete="off" spellcheck="false"></label>
+        <label class="field"><span>Team</span><input id="custTeam" type="text" maxlength="14" autocomplete="off" spellcheck="false"></label>
+      </div>
+      <div class="cust-row"><span class="cust-label" id="lblSkin">Skin</span><div class="swatches" role="radiogroup" aria-labelledby="lblSkin" data-key="skin"></div></div>
+      <div class="cust-row"><span class="cust-label" id="lblHairStyle">Hair</span><div class="chips" role="radiogroup" aria-labelledby="lblHairStyle" data-key="hairStyle"></div></div>
+      <div class="cust-row"><span class="cust-label" id="lblHair">Hair colour</span><div class="swatches" role="radiogroup" aria-labelledby="lblHair" data-key="hair"></div></div>
+      <div class="cust-row"><span class="cust-label" id="lblOutfit">Outfit</span><div class="chips" role="radiogroup" aria-labelledby="lblOutfit" data-key="outfit"></div></div>
+      <div class="cust-row"><span class="cust-label" id="lblOutfitColour">Outfit colour</span><div class="swatches" role="radiogroup" aria-labelledby="lblOutfitColour" data-key="outfitColour"></div></div>
+      <div class="cust-row"><button class="chip" id="custGlasses" aria-pressed="false">Glasses</button></div>
+    </div>
+    <div class="cust-actions">
+      <button class="btn primary" id="custDone">Done</button>
+      <button class="btn small" id="custShuffle">Surprise me</button>
+      <button class="btn small" id="custReset">Reset</button>
+    </div>
+  </div>
+</section>
+
 <!-- Pause -->
 <section id="pause" class="overlay" role="dialog" aria-modal="true" aria-labelledby="pauseTitle">
   <div class="memo">
-    <div class="memo-head"><div><b>TO:</b> Jules Park</div><div><b>FROM:</b> The break room</div><div><b>RE:</b> Coffee break</div></div>
+    <div class="memo-head"><div><b>TO:</b> <span id="pauseTo">Jules Park</span></div><div><b>FROM:</b> The break room</div><div><b>RE:</b> Coffee break</div></div>
     <h2 id="pauseTitle">Paused</h2>
     <p class="sub">The boss can't see you. Probably.</p>
     <div class="memo-actions">
@@ -427,6 +456,7 @@
 
 <script src="js/util.js"></script>
 <script src="js/config.js"></script>
+<script src="js/cast.js"></script>
 <script src="js/art.js"></script>
 <script src="js/audio.js"></script>
 <script src="js/player.js"></script>
@@ -434,6 +464,7 @@
 <script src="js/renderer.js"></script>
 <script src="js/confetti.js"></script>
 <script src="js/ui.js"></script>
+<script src="js/customise.js"></script>
 <script src="js/game.js"></script>
 <script src="js/main.js"></script>
 </body>
