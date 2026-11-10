@@ -11,16 +11,22 @@ const CAUGHT_LINES = ['HR would like a word.', "That spreadsheet won't save you.
 class Game {
   constructor() {
     this.state = S.MENU; this.resumeTo = null;
+    this.levelId = LEVELS[store.get('level', DEFAULT_LEVEL)] ? store.get('level', DEFAULT_LEVEL) : DEFAULT_LEVEL;
+    // Older versions kept one best score. Treat it as the Wednesday (normal) best.
+    const legacy = store.get('best', null);
+    if (legacy && !store.get('best.wednesday', null)) store.set('best.wednesday', legacy);
     this.manager = new Manager(this);
     this.resetValues();
   }
   resetValues() {
-    this.romance = 0; this.timeLeft = CONFIG.duration; this.strikes = 0;
+    this.romance = 0; this.timeLeft = this.level.duration; this.strikes = 0;
     this.freezeT = 0; this.watchedMs = 0; this.wasKissing = false; this.kissingNow = false;
     this.cdT = 0; this.lastCd = null; this.endT = 0; this.result = null; this.lastSec = 999; this.said50 = false; this.said85 = false;
   }
+  get level() { return LEVELS[this.levelId]; }
+  setLevel(id) { if (LEVELS[id]) { this.levelId = id; store.set('level', id); if (this.state === S.MENU) this.timeLeft = this.level.duration; } }
   setState(s) { this.state = s; document.body.dataset.state = s; }
-  tier() { return CONFIG.tiers.find(t => this.romance < t.until) || CONFIG.tiers[CONFIG.tiers.length - 1]; }
+  tier() { const t = this.level.tiers; return t.find(x => this.romance < x.until) || t[t.length - 1]; }
 
   start() {
     sfx.unlock();
@@ -108,7 +114,7 @@ class Game {
       this.watchedMs = 0;
     }
 
-    if (kissing) this.romance = Math.min(100, this.romance + CONFIG.romanceRate * dt);
+    if (kissing) this.romance = Math.min(100, this.romance + this.level.romanceRate * dt);
 
     if (!this.said50 && this.romance >= 50) { this.said50 = true; ui.toast('Halfway there. Keep it professional.', 'love', 1); }
     if (!this.said85 && this.romance >= 85) { this.said85 = true; ui.toast('So close. The boss is getting twitchy.', 'love', 1); }
@@ -152,18 +158,20 @@ class Game {
   end(kind) {
     this.wasKissing = false; this.kissingNow = false;
     player.clear();
-    const r = { kind, romance: this.romance, timeLeft: this.timeLeft, strikes: this.strikes };
+    const r = { kind, romance: this.romance, timeLeft: this.timeLeft, strikes: this.strikes, level: this.level };
     if (kind === 'win') {
       this.setState(S.WON);
-      r.score = Math.round(this.romance * 10 + this.timeLeft * 20 - this.strikes * 250);
+      // Time left is scaled to a 75 s day so scores compare across levels; harder levels add a bonus.
+      r.score = Math.round(this.romance * 10 + (this.timeLeft / this.level.duration) * 1500 - this.strikes * 250 + this.level.scoreBonus);
       const rk = RANKS.find(x => r.score >= x.min);
       r.rank = rk.rank; r.title = rk.title;
-      const best = store.get('best', null);
+      const key = 'best.' + this.levelId;
+      const best = store.get(key, null);
       if (!best || r.score > best.score) {
         r.newBest = true;
-        store.set('best', { score: r.score, rank: r.rank, timeLeft: Math.ceil(r.timeLeft), strikes: r.strikes });
+        store.set(key, { score: r.score, rank: r.rank, timeLeft: Math.ceil(r.timeLeft), strikes: r.strikes });
       }
-      r.best = store.get('best', null);
+      r.best = store.get(key, null);
       renderer.win(); sfx.win(); confetti.start(3.2);
       ui.toast('Love wins. Productivity loses.', 'love', 3, 2200);
       this.endT = 2.0;

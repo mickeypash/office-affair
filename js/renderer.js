@@ -153,7 +153,7 @@ class Renderer {
     this.updateManager(dt, g);
 
     /* clock + sky */
-    const p = g.state === S.MENU ? 0 : clamp(1 - g.timeLeft / CONFIG.duration, 0, 1);
+    const p = g.state === S.MENU ? 0 : clamp(1 - g.timeLeft / g.level.duration, 0, 1);
     const hours = 9 + 8 * p - (g.state === S.MENU ? 0.02 : 0);
     e.hourHand.setAttribute('transform', `rotate(${((hours % 12) * 30).toFixed(2)})`);
     e.minHand.setAttribute('transform', `rotate(${(((hours * 60) % 60) * 6).toFixed(2)})`);
