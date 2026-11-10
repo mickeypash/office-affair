@@ -32,7 +32,7 @@ A round lasts 75 seconds. The boss gets less predictable as the meter fills: 0â€
 
 ## Play online
 
-**https://mickeypash.github.io/office-affair/**
+**https://mickey.sh/office-affair/**
 
 ## Publishing
 
