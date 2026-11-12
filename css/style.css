@@ -80,6 +80,10 @@ body[data-state="MENU"] #hud, body[data-state="MENU"] #controls { opacity: 0; po
 .chance.lost .crack { display: inline; }
 .chance.flash { animation: chanceFlash .6s ease-out; }
 @keyframes chanceFlash { 0% { transform: scale(1.6); } 100% { transform: scale(.82) rotate(-10deg); } }
+.chance.empty { filter: none; }
+.chance.empty .fillp { fill: none; stroke: rgba(255,255,255,.55); stroke-width: 2.2; stroke-dasharray: 4 3.5; }
+.chance.gain { animation: chanceGain .5s cubic-bezier(.3,1.6,.5,1); }
+@keyframes chanceGain { 0% { transform: scale(.3); } 60% { transform: scale(1.35); } 100% { transform: scale(1); } }
 .icon-btn {
   width: 42px; height: 42px; border-radius: 12px; display: grid; place-items: center; padding: 0;
   background: rgba(255,255,255,.12); border: 2px solid rgba(255,255,255,.35);
@@ -318,4 +322,5 @@ kbd {
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; }
   #countdown span { animation: none; }
+  .chance.gain { animation: none; }
 }

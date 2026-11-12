@@ -2,7 +2,7 @@
 
 *Love is a full-time job.*
 
-A small single-player browser game. Two coworkers are secretly in love. You steal kisses while the boss is not looking. Fill the romance meter before 5 pm, and do not get caught three times.
+A small single-player browser game. Two coworkers are secretly in love. You steal kisses while the boss is not looking. Fill the romance meter before 5 pm, and do not get caught.
 
 ## How to open
 
@@ -18,9 +18,11 @@ Open `index.html` in a modern browser (Chrome, Edge, Firefox or Safari). Double-
 
 - **Boss facing away** (typing, sipping coffee, reading, on the phone): kissing is safe.
 - **Yellow ⚠ with a head turn**: the boss is turning around. Kissing is still safe, but let go now.
-- **Boss facing you, red striped sight cone**: kissing for more than 150 ms gives you a strike. You also get a strike while the boss turns back.
+- **Boss facing you, red striped sight cone**: kissing for more than 150 ms gets you caught. Kissing while the boss turns back also gets you caught.
 - **Dashed ? while the boss stretches, or lowers his phone and swaps it to his other ear**: this is a bluff. The boss will not turn. He never bluffs twice in a row.
-- Three strikes ends the game with a meeting with HR. If the clock gets to 5 pm first, you are clocked out.
+- You start with 1 life, so at first one catch ends the game with a meeting with HR.
+- You earn a life when the meter reaches 35%, and another at 70%. You can hold up to 3. Each catch costs a life.
+- If the clock gets to 5 pm first, you are clocked out.
 
 A round lasts 75 seconds. The boss gets less predictable as the meter fills (0–30%, 30–70%, 70–100%). You get a rank (S, A, B or C) when you win. Your best result, your pick and your sound setting are saved in `localStorage`.
 
