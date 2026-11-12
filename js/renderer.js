@@ -8,7 +8,7 @@ class Renderer {
     this.chars = {};
     this.buildChar('L');
     this.buildChar('R');
-    const ids = ['mgrBody', 'mgrBack', 'mgrSide', 'mgrFront', 'actType', 'actCoffee', 'actRead', 'actPhone', 'actStretchArms',
+    const ids = ['mgrBody', 'mgrBack', 'mgrSide', 'mgrFront', 'actType', 'actCoffee', 'actRead', 'actPhone', 'actPhoneL', 'actStretchArms',
       'elbowL', 'elbowR', 'mug', 'paper', 'mgrLids', 'mgrBrowStern', 'mgrBrowUp', 'mgrMouthFlat', 'mgrMouthO', 'mgrEyes',
       'warnIcon', 'fakeIcon', 'bigBang', 'thought', 'thoughtText', 'thoughtBox', 'cone', 'coneFill', 'coneLine',
       'hourHand', 'minHand', 'sky0', 'sky1', 'sun', 'cityLights', 'warm', 'warm2', 'dim', 'cupL', 'spill', 'sheetPop', 'emailPop',
@@ -16,6 +16,8 @@ class Renderer {
       'plantL', 'plantR', 'hearts', 'notes'];
     this.el = {};
     ids.forEach(id => { this.el[id] = $(id); });
+    const phoneArm = g => ({ paths: [...g.children].filter(n => n.tagName === 'path'), hand: g.querySelector('.phone-hand'), k: 0 });
+    this.phoneArms = { R: phoneArm(this.el.actPhone), L: phoneArm(this.el.actPhoneL) };
     this.heartPool = [];
     for (let i = 0; i < 28; i++) {
       const u = document.createElementNS('http://www.w3.org/2000/svg', 'use');
@@ -308,7 +310,7 @@ class Renderer {
 
   updateManager(dt, g) {
     const e = this.el, m = g.manager, t = this.t;
-    let pose = 'back', icon = '', bang = false, rise = 0, stern = true, mouthO = false, lids = true, activity = m.activity, stretch = false;
+    let pose = 'back', icon = '', bang = false, rise = 0, stern = true, mouthO = false, lids = true, activity = m.activity, stretch = false, phoneFake = false;
     const playingish = g.state === S.PLAYING || g.state === S.PAUSED || g.state === S.COUNTDOWN;
 
     if (g.state === S.MENU) { pose = 'front'; activity = ''; }
@@ -320,7 +322,8 @@ class Renderer {
       switch (m.state) {
         case M.DISTRACTED: pose = 'back'; break;
         case M.SUSPICIOUS:
-          if (m.fake) { pose = 'back'; stretch = true; icon = 'fake'; activity = ''; }
+          if (m.fake && m.fakeKind === 'phone') { pose = 'back'; phoneFake = true; icon = 'fake'; activity = 'phone'; }
+          else if (m.fake) { pose = 'back'; stretch = true; icon = 'fake'; activity = ''; }
           else { pose = 'side'; icon = 'warn'; rise = -8; }
           break;
         case M.WATCHING: pose = 'front'; break;
@@ -334,11 +337,21 @@ class Renderer {
     }
     if (pose === 'back') {
       const act = stretch ? '' : activity;
-      if (act !== this.lastActivity || stretch !== this.lastStretch) {
-        vis(e.actType, act === 'type'); vis(e.actCoffee, act === 'coffee'); vis(e.actRead, act === 'read'); vis(e.actPhone, act === 'phone');
-        vis(e.actStretchArms, stretch);
-        this.lastActivity = act; this.lastStretch = stretch;
+      // Phone bluff: lower the right-hand phone (first 45%), pause, then hold it to the left ear (last 40%).
+      let side = m.phoneHand === 'left' ? 'L' : 'R', k = 0;
+      if (phoneFake) {
+        const p = m.progress;
+        side = p < 0.6 ? 'R' : 'L';
+        if (side === 'R') k = REDUCED ? (p < 0.2 ? 0 : 1) : Math.sin(clamp(p / 0.45, 0, 1) * Math.PI / 2);
+        else k = REDUCED ? 0 : 1 - Math.sin(clamp((p - 0.6) / 0.12, 0, 1) * Math.PI / 2);
       }
+      if (act !== this.lastActivity || stretch !== this.lastStretch || side !== this.lastPhoneSide) {
+        vis(e.actType, act === 'type'); vis(e.actCoffee, act === 'coffee'); vis(e.actRead, act === 'read');
+        vis(e.actPhone, act === 'phone' && side === 'R'); vis(e.actPhoneL, act === 'phone' && side === 'L');
+        vis(e.actStretchArms, stretch);
+        this.lastActivity = act; this.lastStretch = stretch; this.lastPhoneSide = side;
+      }
+      if (act === 'phone') this.posePhone(side, k);
       if (act === 'type' && !REDUCED) {
         e.elbowL.setAttribute('transform', `translate(0,${(Math.sin(t * 16) * 3).toFixed(2)})`);
         e.elbowR.setAttribute('transform', `translate(0,${(Math.sin(t * 16 + 2) * 3).toFixed(2)})`);
@@ -419,6 +432,17 @@ class Renderer {
         this.showThought(pick(lines));
       }
     }
+  }
+  /* Phone arm on side R or L. k = 0: phone at the ear. k = 1: lowered to the desk. */
+  posePhone(side, k) {
+    const a = this.phoneArms[side];
+    if (a.k === k) return;
+    a.k = k;
+    const s = side === 'R' ? 1 : -1, f = v => (v * s).toFixed(1);
+    const hx = lerp(92, 158, k), hy = lerp(-250, -150, k), cx = lerp(132, 150, k), cy = lerp(-196, -186, k);
+    const d = `M${f(88)},-150 Q${f(cx)},${cy.toFixed(1)} ${f(hx)},${(hy + 6).toFixed(1)}`;
+    a.paths.forEach(n => n.setAttribute('d', d));
+    a.hand.setAttribute('transform', `translate(${f(hx - 92)},${(hy + 250).toFixed(1)}) rotate(${f(k * 70)} ${f(92)} -250)`);
   }
   showThought(text) {
     const e = this.el;

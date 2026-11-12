@@ -19,7 +19,7 @@ Open `index.html` in a modern browser (Chrome, Edge, Firefox or Safari). Double-
 - **Boss facing away** (typing, sipping coffee, reading, on the phone): kissing is safe.
 - **Yellow ⚠ with a head turn**: the boss is turning around. Kissing is still safe, but let go now.
 - **Boss facing you, red striped sight cone**: kissing for more than 150 ms gives you a strike. You also get a strike while the boss turns back.
-- **Dashed ? while the boss stretches** (only after 70%): this is a bluff. The boss will not turn.
+- **Dashed ? while the boss stretches, or lowers his phone and swaps it to his other ear**: this is a bluff. The boss will not turn. He never bluffs twice in a row.
 - Three strikes ends the game with a meeting with HR. If the clock gets to 5 pm first, you are clocked out.
 
 A round lasts 75 seconds. The boss gets less predictable as the meter fills (0–30%, 30–70%, 70–100%). You get a rank (S, A, B or C) when you win. Your best result, your pick and your sound setting are saved in `localStorage`.

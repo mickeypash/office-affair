@@ -140,7 +140,7 @@ class Game {
       if (info.fake) sfx.hmm();
       else { sfx.warn(); ui.toast("Uh-oh. Someone's watching.", 'warn', 2, 1300); }
     } else if (state === M.DISTRACTED) {
-      if (info.fromFake) ui.toast('False alarm. Just a stretch.', '', 1, 1400);
+      if (info.fromFake) ui.toast(info.kind === 'phone' ? 'False alarm. He switched ears.' : 'False alarm. Just a stretch.', '', 1, 1400);
       else if (!info.afterCaught && prev === M.RETURNING) ui.toast('The boss is distracted...', '', 1, 1300);
     }
   }

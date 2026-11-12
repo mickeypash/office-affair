@@ -15,9 +15,9 @@ const LEVELS = {
   wednesday: {
     name: 'Wednesday', duration: 75, romanceRate: 3.75, scoreBonus: 0,   // romanceRate calibrated up from the 2%/s spec value
     tiers: [
-      { until: 30,  distracted: [3.5, 5.0], suspicious: [0.95, 1.1], watching: [1.5, 2.3], fake: 0 },
-      { until: 70,  distracted: [2.6, 4.6], suspicious: [0.8, 1.0],  watching: [1.5, 3.0], fake: 0 },
-      { until: 999, distracted: [2.5, 3.6], suspicious: [0.65, 0.8], watching: [1.8, 3.0], fake: 0.32 },
+      { until: 30,  distracted: [3.5, 5.0], suspicious: [0.95, 1.1], watching: [1.5, 2.3], fake: 0.10 },
+      { until: 70,  distracted: [2.6, 4.6], suspicious: [0.8, 1.0],  watching: [1.5, 3.0], fake: 0.20 },
+      { until: 999, distracted: [2.5, 3.6], suspicious: [0.65, 0.8], watching: [1.8, 3.0], fake: 0.35 },
     ],
   },
 };
