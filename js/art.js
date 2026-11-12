@@ -332,8 +332,18 @@ function managerSVG() {
     </g>
     <g id="actPhone" display="none">
       ${limb('M88,-150 Q132,-196 92,-244', blazer, 36)}
-      <rect x="66" y="-300" width="30" height="66" rx="9" fill="#3D3557" ${SW(6)}/>
-      <circle cx="92" cy="-250" r="17" fill="${skin}" ${SW(6)}/>
+      <g class="phone-hand">
+        <rect x="66" y="-300" width="30" height="66" rx="9" fill="#3D3557" ${SW(6)}/>
+        <circle cx="92" cy="-250" r="17" fill="${skin}" ${SW(6)}/>
+      </g>
+    </g>
+    <!-- Left-hand phone: the mirror of actPhone, used after the phone bluff -->
+    <g id="actPhoneL" display="none">
+      ${limb('M-88,-150 Q-132,-196 -92,-244', blazer, 36)}
+      <g class="phone-hand">
+        <rect x="-96" y="-300" width="30" height="66" rx="9" fill="#3D3557" ${SW(6)}/>
+        <circle cx="-92" cy="-250" r="17" fill="${skin}" ${SW(6)}/>
+      </g>
     </g>
   </g>
   <!-- SIDE VIEW (turning toward the couple) -->
