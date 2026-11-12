@@ -32,7 +32,7 @@ function coworkerBody(o) {
         <g class="eyes-open"><g class="pupils">
           <ellipse cx="-26" cy="0" rx="7.5" ry="10.5" fill="${INK}"/><ellipse cx="26" cy="0" rx="7.5" ry="10.5" fill="${INK}"/>
           <circle cx="-23.5" cy="-4" r="2.8" fill="#fff"/><circle cx="28.5" cy="-4" r="2.8" fill="#fff"/>
-        </g></g>
+        </g>${o.eyeLids || ''}</g>
         <g class="eyes-blink" display="none"><path d="M-35,1 L-17,1 M17,1 L35,1" ${SW(5)}/></g>
         <g class="eyes-happy" display="none"><path d="M-36,4 Q-26,-8 -16,4 M16,4 Q26,-8 36,4" fill="none" ${SW(5)}/></g>
         <g class="eyes-wide" display="none">
@@ -217,6 +217,11 @@ const makeupProfile = d => `<path d="M${40 * d},-3 L${50 * d},-10" stroke="${INK
 const POUT = `<path d="M-9,34 Q-12,26 -4,27 Q0,24 4,27 Q12,26 9,34 Q6,44 0,44 Q-6,44 -9,34 Z" fill="#D9667F" ${SW(3.5)}/>
   <path d="M-6,34 Q0,36 6,34" fill="none" stroke="${INK}" stroke-width="2.5"/>`;
 const LIP_SMILE = `<path d="M-17,32 Q0,47 17,32" fill="none" ${SW(5)}/><path d="M-10,37 Q0,43 10,37" fill="none" stroke="#D9667F" stroke-width="3" stroke-linecap="round"/>`;
+// Vix's resting "mean" face: heavy lids, brows that slope in, and a one-sided smirk.
+const meanLids = skin => `<g><path d="M-36,-17 L-16,-17 L-16,-4 Q-26,-7 -36,-4 Z M16,-17 L36,-17 L36,-4 Q26,-7 16,-4 Z" fill="${skin}"/>
+  <path d="M-36,-4 Q-26,-7 -16,-4 M16,-4 Q26,-7 36,-4" fill="none" stroke="${INK}" stroke-width="4.5" stroke-linecap="round"/></g>`;
+const MEAN_BROWS = `<path class="brows" d="M-39,-30 Q-28,-30 -15,-23 M15,-23 Q28,-30 39,-30" fill="none" ${SW(5.5)}/>`;
+const SMIRK = `<path d="M-13,37 Q2,40 15,30" fill="none" ${SW(5)}/><path d="M-6,39 Q4,40 10,36" fill="none" stroke="#C9566E" stroke-width="3" stroke-linecap="round"/>`;
 const MALE_HEAD = skin => `<path d="M-70,-2 C-70,-42 -40,-72 0,-72 C40,-72 70,-42 70,-2 L67,30 Q60,68 0,76 Q-60,68 -67,30 Z" fill="${skin}" ${SW()}/>`;
 const maleBrows = h => `<path class="brows" d="M-40,-26 L-14,-24 M14,-24 L40,-26" stroke="${h}" stroke-width="8" stroke-linecap="round"/>`;
 const maleBrowProfile = (d, h) => `<path d="M${14 * d},-24 L${44 * d},-26" stroke="${h}" stroke-width="8" stroke-linecap="round"/>`;
@@ -236,7 +241,9 @@ function girlOpts(m, dir) {
   return {
     dir, skin: m.skin, top: outfit.top ? outfit.top(m.outfitColour) : m.outfitColour, sleeve: outfit.sleeve(m.outfitColour),
     outfit: outfit.svg(m.outfitColour), hairBack: hair.back(m.hair), hairFront: hair.front(m.hair),
-    smile: m.mouth === 'pout' ? POUT : (m.makeup ? LIP_SMILE : null),
+    smile: m.mouth === 'pout' ? POUT : m.mouth === 'smirk' ? SMIRK : (m.makeup ? LIP_SMILE : null),
+    brows: m.mood === 'mean' ? MEAN_BROWS : null,
+    eyeLids: m.mood === 'mean' ? meanLids(m.skin) : '',
     faceExtra: (m.makeup ? MAKEUP : '') + (m.glasses ? ROUND_GLASSES(INK) : ''),
     profileExtra: (m.makeup ? makeupProfile(dir) : '') + (m.glasses ? roundGlassesProfile(dir, INK) : ''),
   };

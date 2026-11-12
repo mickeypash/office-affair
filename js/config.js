@@ -56,7 +56,7 @@ const GIRLS = {
   },
   vix: {
     name: 'Vix', skin: '#F5D3BC', hairStyle: 'wavy', hair: 'url(#hairVix)', outfit: 'blazer', outfitColour: '#18151C',
-    glasses: false, makeup: true, mouth: null,   // normal smile; never tongue out
+    glasses: false, makeup: true, mouth: 'smirk', mood: 'mean',   // resting mean face; never tongue out
   },
 };
 const DEFAULT_CUSTOM = {
