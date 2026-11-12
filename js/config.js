@@ -2,7 +2,9 @@
 /* Game rules, states and constants */
 /* Rules shared by every level. */
 const CONFIG = {
-  maxStrikes: 3,
+  startLives: 1,         // one catch ends the round at first
+  maxLives: 3,
+  lifeAt: [35, 70],      // romance % that each earn +1 life, once per round
   detectMs: 150,         // continuous kissing while watched before a strike
   freeze: 1.0,           // caught reaction freeze
   returning: 0.4,        // seconds the boss takes to turn back

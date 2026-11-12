@@ -11,10 +11,11 @@ const ui = {
       'toast', 'countdown', 'menu', 'pause', 'result', 'btnPlay', 'btnSoundMenu', 'bestLine', 'btnResume', 'btnRestart', 'btnQuit',
       'btnAgain', 'btnMenu', 'resultHead', 'resultTitle', 'resultSub', 'resultRank', 'resultStats', 'resultStamp', 'kissBtn']
       .forEach(id => { this.el[id] = $(id); });
-    this.el.strikes.innerHTML = CHANCE_SVG.repeat(CONFIG.maxStrikes);
+    this.el.strikes.innerHTML = CHANCE_SVG.repeat(CONFIG.maxLives);
     this.shownRomance = 0; this.lastPct = -1; this.lastTime = ''; this.lastTimerCls = ''; this.lastPulse = 0; this.toastTimer = null; this.toastPri = 0;
     this.syncSound();
     this.showBest();
+    this.reset();
   },
   syncSound() {
     const on = sfx.enabled;
@@ -29,8 +30,9 @@ const ui = {
   },
   reset() {
     this.shownRomance = 0; this.lastPct = -1; this.lastTime = ''; this.lastPulse = 0;
-    this.el.strikes.querySelectorAll('.chance').forEach(c => c.classList.remove('lost', 'flash'));
-    this.el.strikes.setAttribute('aria-label', `${CONFIG.maxStrikes} chances left`);
+    // Start lives are filled; the rest are dashed outlines until earned
+    this.el.strikes.querySelectorAll('.chance').forEach((c, i) => { c.classList.remove('lost', 'flash', 'gain'); c.classList.toggle('empty', i >= CONFIG.startLives); });
+    this.livesLabel(CONFIG.startLives);
     this.el.countdown.innerHTML = '';
     this.hideToast(true);
   },
@@ -57,12 +59,34 @@ const ui = {
     // kiss button pressed look
     this.el.kissBtn.classList.toggle('pressed', player.holding && (g.state === S.PLAYING || g.state === S.COUNTDOWN));
   },
-  strike(n) {
-    const chances = [...this.el.strikes.querySelectorAll('.chance')];
-    const idx = CONFIG.maxStrikes - n; // remove from the right
-    const c = chances[idx];
-    if (c) { c.classList.add('lost', 'flash'); }
-    this.el.strikes.setAttribute('aria-label', `${CONFIG.maxStrikes - n} chances left`);
+  livesLabel(n) { this.el.strikes.setAttribute('aria-label', n === 1 ? '1 life' : `${n} lives`); },
+  // Hearts always read left to right: filled (current lives), then cracked (lost), then dashed (not earned yet).
+  arrangeLives(filled, lost, anim) {
+    [...this.el.strikes.querySelectorAll('.chance')].forEach((c, i) => {
+      c.classList.remove('lost', 'empty', 'flash', 'gain');
+      if (i >= filled + lost) c.classList.add('empty');
+      else if (i >= filled) c.classList.add('lost');
+      if (anim === 'gain' && i === filled - 1 && !REDUCED) { void c.getBoundingClientRect(); c.classList.add('gain'); }
+      if (anim === 'flash' && i === filled) c.classList.add('flash');
+    });
+  },
+  lifeCounts() {
+    const all = [...this.el.strikes.querySelectorAll('.chance')];
+    const lost = all.filter(c => c.classList.contains('lost')).length, empty = all.filter(c => c.classList.contains('empty')).length;
+    return { filled: all.length - lost - empty, lost };
+  },
+  loseLife(n) {
+    const { filled, lost } = this.lifeCounts();
+    if (filled > 0) this.arrangeLives(filled - 1, lost + 1, 'flash');
+    this.livesLabel(n);
+  },
+  gainLife(n) {
+    // Use a slot not yet earned if there is one, otherwise heal a cracked heart.
+    const { filled, lost } = this.lifeCounts();
+    const slots = this.el.strikes.querySelectorAll('.chance').length;
+    if (filled + lost < slots) this.arrangeLives(filled + 1, lost, 'gain');
+    else if (lost > 0) this.arrangeLives(filled + 1, lost - 1, 'gain');
+    this.livesLabel(n);
   },
   toast(msg, kind = '', pri = 1, ms = 1700) {
     if (this.toastTimer && pri < this.toastPri) return;

@@ -19,7 +19,7 @@ class Game {
     this.resetValues();
   }
   resetValues() {
-    this.romance = 0; this.timeLeft = this.level.duration; this.strikes = 0;
+    this.romance = 0; this.timeLeft = this.level.duration; this.strikes = 0; this.lives = CONFIG.startLives; this.nextLife = 0;
     this.freezeT = 0; this.watchedMs = 0; this.wasKissing = false; this.kissingNow = false;
     this.cdT = 0; this.lastCd = null; this.endT = 0; this.result = null; this.lastSec = 999; this.said50 = false; this.said85 = false;
   }
@@ -92,7 +92,7 @@ class Game {
       this.freezeT -= dt;
       this.kissingNow = false;
       if (this.freezeT <= 0) {
-        if (this.strikes >= CONFIG.maxStrikes) { this.end('hr'); return; }
+        if (this.lives <= 0) { this.end('hr'); return; }
         this.manager.enter(M.DISTRACTED, rand(...this.tier().distracted), { afterCaught: true });
       }
       return;
@@ -116,6 +116,7 @@ class Game {
     }
 
     if (kissing) this.romance = Math.min(100, this.romance + this.level.romanceRate * dt);
+    if (this.nextLife < CONFIG.lifeAt.length && this.romance >= CONFIG.lifeAt[this.nextLife]) { this.nextLife++; this.gainLife(); }
 
     if (!this.said50 && this.romance >= 50) { this.said50 = true; ui.toast('Halfway there. Keep it professional.', 'love', 1); }
     if (!this.said85 && this.romance >= 85) { this.said85 = true; ui.toast('So close. The boss is getting twitchy.', 'love', 1); }
@@ -145,15 +146,23 @@ class Game {
     }
   }
 
+  gainLife() {
+    if (this.lives >= CONFIG.maxLives) return;
+    this.lives++;
+    ui.gainLife(this.lives);
+    sfx.life();
+    ui.toast('+1 life. Keep going.', 'love', 2);
+  }
+
   caught() {
-    this.strikes++;
+    this.strikes++; this.lives = Math.max(0, this.lives - 1);
     this.watchedMs = 0; this.wasKissing = false; this.kissingNow = false;
     player.lock();
     this.freezeT = CONFIG.freeze;
     renderer.caught();
     sfx.caught();
-    ui.strike(this.strikes);
-    ui.toast(this.strikes >= CONFIG.maxStrikes ? 'HR would like a word.' : pick(CAUGHT_LINES), 'alarm', 3, 1500);
+    ui.loseLife(this.lives);
+    ui.toast(this.lives <= 0 ? 'HR would like a word.' : pick(CAUGHT_LINES), 'alarm', 3, 1500);
   }
 
   end(kind) {

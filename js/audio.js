@@ -56,6 +56,7 @@ class Sfx {
   win()  { [523, 659, 784, 1047].forEach((f, i) => this.tone(f, 0.24, { type: 'triangle', vol: 0.16, delay: i * 0.11 })); this.tone(1319, 0.6, { vol: 0.12, delay: 0.48 }); this.tone(1568, 0.7, { vol: 0.08, delay: 0.6 }); }
   lose() { [392, 349, 311, 262].forEach((f, i) => this.tone(f, 0.34, { type: 'triangle', vol: 0.14, delay: i * 0.24 })); }
   count(go) { this.tone(go ? 880 : 523, go ? 0.4 : 0.14, { type: 'square', vol: 0.07 }); }
+  life() { [784, 988, 1319].forEach((f, i) => this.tone(f, 0.16, { type: 'triangle', vol: 0.11, delay: i * 0.08 })); this.tone(1568, 0.4, { vol: 0.07, delay: 0.24 }); }
   ding() { this.tone(1568, 0.25, { vol: 0.05 }); this.tone(2093, 0.3, { vol: 0.04, delay: 0.09 }); }
   click() { this.tone(660, 0.05, { type: 'triangle', vol: 0.08 }); }
 }
