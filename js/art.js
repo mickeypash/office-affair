@@ -28,6 +28,7 @@ function coworkerBody(o) {
         <g class="blush-f" opacity="${o.male ? 0 : '.3'}">
           <ellipse cx="-44" cy="24" rx="13" ry="8" fill="#FF6F91"/><ellipse cx="44" cy="24" rx="13" ry="8" fill="#FF6F91"/>
         </g>
+        ${o.faceUnder || ''}
         <g class="eyes-open"><g class="pupils">
           <ellipse cx="-26" cy="0" rx="7.5" ry="10.5" fill="${INK}"/><ellipse cx="26" cy="0" rx="7.5" ry="10.5" fill="${INK}"/>
           <circle cx="-23.5" cy="-4" r="2.8" fill="#fff"/><circle cx="28.5" cy="-4" r="2.8" fill="#fff"/>
@@ -50,6 +51,7 @@ function coworkerBody(o) {
         ${o.faceExtra || ''}
       </g>
       <g class="f-profile" display="none">
+        ${o.profileUnder || ''}
         ${o.male ? '' : `<ellipse cx="${X(32)}" cy="24" rx="14" ry="8" fill="#FF6F91" opacity=".55"/>`}
         <path d="M${X(18)},-2 Q${X(28)},7 ${X(40)},-2" fill="none" ${SW(5)}/>
         ${o.profileBrow || `<path d="M${X(14)},-25 Q${X(28)},-32 ${X(42)},-24" fill="none" ${SW(5)}/>`}
@@ -218,9 +220,14 @@ const LIP_SMILE = `<path d="M-17,32 Q0,47 17,32" fill="none" ${SW(5)}/><path d="
 const MALE_HEAD = skin => `<path d="M-70,-2 C-70,-42 -40,-72 0,-72 C40,-72 70,-42 70,-2 L67,30 Q60,68 0,76 Q-60,68 -67,30 Z" fill="${skin}" ${SW()}/>`;
 const maleBrows = h => `<path class="brows" d="M-40,-26 L-14,-24 M14,-24 L40,-26" stroke="${h}" stroke-width="8" stroke-linecap="round"/>`;
 const maleBrowProfile = (d, h) => `<path d="M${14 * d},-24 L${44 * d},-26" stroke="${h}" stroke-width="8" stroke-linecap="round"/>`;
-const STUBBLE = h => `<path d="M-62,10 C-60,50 -36,72 0,74 C36,72 60,50 62,10 C50,40 30,52 0,52 C-30,52 -50,40 -62,10 Z M-22,24 Q0,18 22,24 Q0,28 -22,24 Z" fill="${h}" opacity=".28"/>`;
-const BEARD = h => `<path d="M-64,4 C-64,56 -36,82 0,84 C36,82 64,56 64,4 C56,30 40,40 26,44 Q0,36 -26,44 C-40,40 -56,30 -64,4 Z" fill="${h}" ${SW(4)}/><path d="M-18,26 Q0,18 18,26 Q0,32 -18,26 Z" fill="${h}"/>`;
-const stubbleProfile = (d, h) => `<path d="M${20 * d},20 C${30 * d},60 ${60 * d},60 ${70 * d},34 L${66 * d},20 C${50 * d},40 ${36 * d},40 ${20 * d},20 Z" fill="${h}" opacity=".3"/>`;
+// Facial hair sits under the eyes and mouth. The beard leaves a skin-coloured gap round the lips.
+const BEARD = h => `<path fill-rule="evenodd" d="M-69,4 L-66,32 Q-58,72 0,80 Q58,72 66,32 L69,4 C58,26 44,34 28,34 Q0,26 -28,34 C-44,34 -58,26 -69,4 Z M-19,38 a19,11 0 1,0 38,0 a19,11 0 1,0 -38,0 Z" fill="${h}" ${SW(5)}/>
+  <path d="M-22,29 Q-11,21 0,26 Q11,21 22,29 Q11,32 0,29 Q-11,32 -22,29 Z" fill="${h}" ${SW(3)}/>`;
+const STUBBLE = h => `<path fill-rule="evenodd" d="M-64,14 Q-58,62 0,72 Q58,62 64,14 C52,34 38,40 24,38 Q0,30 -24,38 C-38,40 -52,34 -64,14 Z M-18,38 a18,10 0 1,0 36,0 a18,10 0 1,0 -36,0 Z" fill="${h}" opacity=".26"/>
+  <path d="M-20,28 Q0,22 20,28" fill="none" stroke="${h}" stroke-opacity=".3" stroke-width="5" stroke-linecap="round"/>`;
+const beardProfile = (d, h) => `<path d="M${-34 * d},8 C${-30 * d},52 ${0 * d},78 ${30 * d},78 C${48 * d},76 ${60 * d},64 ${60 * d},50 C${52 * d},52 ${42 * d},46 ${36 * d},36 C${18 * d},40 ${-10 * d},30 ${-34 * d},8 Z" fill="${h}" ${SW(5)}/>
+  <path d="M${50 * d},26 Q${60 * d},20 ${72 * d},26" fill="none" stroke="${h}" stroke-width="7" stroke-linecap="round"/>`;
+const stubbleProfile = (d, h) => `<path d="M${-30 * d},14 C${-24 * d},54 ${0 * d},72 ${30 * d},72 C${52 * d},70 ${62 * d},60 ${64 * d},46 C${52 * d},50 ${40 * d},44 ${34 * d},36 C${16 * d},40 ${-8 * d},32 ${-30 * d},14 Z" fill="${h}" opacity=".28"/>`;
 
 /* A girl's settings (see GIRLS / DEFAULT_CUSTOM in config.js) -> options for coworkerBody. */
 function girlOpts(m, dir) {
@@ -248,12 +255,14 @@ function guyOpts(g, dir) {
   const hair = HAIR_ART[g.hairStyle] || HAIR_ART.crop;
   const o = GUY_OUTFITS[g.outfitKey](g.colour);
   const facial = g.facial === 'stubble' ? STUBBLE(g.hair) : g.facial === 'beard' ? BEARD(g.hair) : '';
+  const facialP = g.facial === 'stubble' ? stubbleProfile(dir, g.hair) : g.facial === 'beard' ? beardProfile(dir, g.hair) : '';
   return {
     dir, male: true, skin: g.skin, top: o.top, sleeve: o.sleeve, outfit: o.svg,
     hairBack: hair.back(g.hair), hairFront: hair.front(g.hair), head: MALE_HEAD(g.skin),
     brows: maleBrows(g.hair), profileBrow: maleBrowProfile(dir, g.hair),
-    faceExtra: facial + (g.glasses ? ROUND_GLASSES(g.glasses) : ''),
-    profileExtra: (g.facial !== 'none' ? stubbleProfile(dir, g.hair) : '') + (g.glasses ? roundGlassesProfile(dir, g.glasses) : ''),
+    faceUnder: facial, profileUnder: facialP,
+    faceExtra: g.glasses ? ROUND_GLASSES(g.glasses) : '',
+    profileExtra: g.glasses ? roundGlassesProfile(dir, g.glasses) : '',
   };
 }
 
