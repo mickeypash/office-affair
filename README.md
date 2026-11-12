@@ -35,7 +35,7 @@ When you win, your score picks one of three endings. You score love points while
 
 Your best score and its ending, your pick and your sound setting are saved in `localStorage`. The thresholds are in `CONFIG.endings` in `js/config.js`.
 
-Tuning lives in `LEVELS` in `js/config.js`. There is one level for now. The Friday (easy) and Monday (hard) levels from PR #3 are in git history.
+Tuning lives in `MODES` in `js/config.js`. A mode holds everything a difficulty can change: round length, romance rate, the boss's timing tiers and bluff chances, lives, the streak, and whether the sight cone and warning toasts are on. At the start of each round the game copies the active mode into `game.rules`, and gameplay code reads only that. There is one mode for now, `standard`. The Friday (easy) and Monday (hard) levels from PR #3 are in git history.
 
 ## Project structure
 
@@ -50,6 +50,8 @@ Tuning lives in `LEVELS` in `js/config.js`. There is one level for now. The Frid
 | `js/audio.js` | Procedural sound effects (Web Audio) |
 | `js/player.js` | Input state (which keys and pointers are held) |
 | `js/manager.js` | The boss's state machine |
+| `js/lives.js` | Lives rules: starting lives, earning one at each threshold, losing one per catch |
+| `js/streak.js` | Streak multiplier and love points |
 | `js/renderer.js` | Animates the scene every frame |
 | `js/confetti.js` | Win confetti (canvas) |
 | `js/ui.js` | HUD, menus, result memos, toasts |

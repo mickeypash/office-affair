@@ -5,7 +5,9 @@ const CAUGHT_LINES = ['HR would like a word.', "That spreadsheet won't save you.
 class Game {
   constructor() {
     this.state = S.MENU; this.resumeTo = null;
-    this.levelId = DEFAULT_LEVEL;
+    this.levelId = DEFAULT_LEVEL;   // best scores are saved per level id
+    this.modeId = DEFAULT_MODE;
+    this.buildRules();
     // Older versions kept one best score. Treat it as the Wednesday (normal) best.
     const legacy = store.get('best', null);
     if (legacy && !store.get('best.wednesday', null)) store.set('best.wednesday', legacy);
@@ -13,21 +15,22 @@ class Game {
     this.resetValues();
   }
   resetValues() {
-    this.romance = 0; this.timeLeft = this.level.duration; this.strikes = 0; this.lives = CONFIG.startLives; this.nextLife = 0;
+    this.romance = 0; this.timeLeft = this.rules.duration; this.strikes = 0;
     this.freezeT = 0; this.watchedMs = 0; this.wasKissing = false; this.kissingNow = false;
     this.cdT = 0; this.lastCd = null; this.endT = 0; this.result = null; this.lastSec = 999; this.said50 = false; this.said85 = false;
-    this.lovePoints = 0; this.resetStreak();
+    lives.onRoundStart(this); streak.onRoundStart(this);
   }
-  // streak = seconds of the current unbroken kiss; multiplier = 1, 2 or 3 (fever)
-  resetStreak() { this.streak = 0; this.multiplier = 1; }
-  get level() { return LEVELS[this.levelId]; }
+  // This round's rules: a shallow copy of the active mode (tiers, lives and streak objects are shared, not copied).
+  buildRules() { this.rules = { ...MODES[this.modeId], id: this.modeId }; }
+  get level() { return this.rules; }   // old name
   setState(s) { this.state = s; document.body.dataset.state = s; }
-  tier() { const t = this.level.tiers; return t.find(x => this.romance < x.until) || t[t.length - 1]; }
+  tier() { const t = this.rules.tiers; return t.find(x => this.romance < x.until) || t[t.length - 1]; }
 
   start() {
     sfx.unlock();
     cast.rollGuy();            // a new random guy every round
     renderer.buildChar('R');
+    this.buildRules();
     this.resetValues();
     this.manager.reset();
     player.clear();
@@ -43,7 +46,7 @@ class Game {
     if (this.state !== S.PLAYING && this.state !== S.COUNTDOWN) return;
     this.resumeTo = this.state;
     this.setState(S.PAUSED);
-    player.clear(); this.resetStreak();
+    player.clear(); streak.reset(this);
     $('pauseTo').textContent = cast.girlName();
     ui.showOverlay('pause');
   }
@@ -112,17 +115,10 @@ class Game {
       this.watchedMs = 0;
     }
 
-    // Streak: an unbroken kiss raises the multiplier, which speeds up the meter and scores love points
-    const st = CONFIG.streak, prevMult = this.multiplier;
-    this.streak = kissing ? this.streak + dt : 0;
-    this.multiplier = this.streak >= st.at3 ? 3 : this.streak >= st.at2 ? 2 : 1;
-    if (this.multiplier > prevMult) { renderer.streakUp(this.multiplier); sfx.streakUp(this.multiplier); }
-
-    if (kissing) {
-      this.romance = Math.min(100, this.romance + this.level.romanceRate * st.fill[this.multiplier - 1] * dt);
-      this.lovePoints += st.points * this.multiplier * dt;
-    }
-    if (this.nextLife < CONFIG.lifeAt.length && this.romance >= CONFIG.lifeAt[this.nextLife]) { this.nextLife++; this.gainLife(); }
+    // Streak (js/streak.js) sets the multiplier and love points and says how fast the meter fills
+    const fill = streak.onKissFrame(this, dt, kissing);
+    if (kissing) this.romance = Math.min(100, this.romance + this.rules.romanceRate * fill * dt);
+    lives.onRomance(this);
 
     if (!this.said50 && this.romance >= 50) { this.said50 = true; ui.toast('Halfway there. Keep it professional.', 'love', 1); }
     if (!this.said85 && this.romance >= 85) { this.said85 = true; ui.toast('So close. The boss is getting twitchy.', 'love', 1); }
@@ -138,50 +134,44 @@ class Game {
     renderer.actNatural();
     const m = this.manager;
     if (this.watchedMs > 0) ui.toast('Unprofessional. Impressive.', 'love', 2);
-    else if (m.state === M.SUSPICIOUS && !m.fake) ui.toast('Act natural!', 'warn', 2);
+    else if (m.state === M.SUSPICIOUS && !m.fake && this.rules.warningToasts) ui.toast('Act natural!', 'warn', 2);
   }
 
   onManager(state, prev, info) {
     if (this.state !== S.PLAYING) return;
     if (state === M.SUSPICIOUS) {
       if (info.fake) sfx.hmm();
-      else { sfx.warn(); ui.toast("Uh-oh. Someone's watching.", 'warn', 2, 1300); }
+      else { sfx.warn(); if (this.rules.warningToasts) ui.toast("Uh-oh. Someone's watching.", 'warn', 2, 1300); }
     } else if (state === M.DISTRACTED) {
       if (info.fromFake) ui.toast(info.kind === 'phone' ? 'False alarm. He switched ears.' : 'False alarm. Just a stretch.', '', 1, 1400);
       else if (!info.afterCaught && prev === M.RETURNING) ui.toast('The boss is distracted...', '', 1, 1300);
     }
   }
 
-  gainLife() {
-    if (this.lives >= CONFIG.maxLives) return;
-    this.lives++;
-    ui.gainLife(this.lives);
-    sfx.life();
-    ui.toast('+1 life. Keep going.', 'love', 2);
-  }
+  gainLife() { lives.gain(this); }
 
   caught() {
-    this.strikes++; this.lives = Math.max(0, this.lives - 1);
+    this.strikes++;
+    const out = lives.onCaught(this);
     this.watchedMs = 0; this.wasKissing = false; this.kissingNow = false;
-    this.resetStreak();
+    streak.reset(this);
     player.lock();
     this.freezeT = CONFIG.freeze;
     renderer.caught();
     sfx.caught();
-    ui.loseLife(this.lives);
-    ui.toast(this.lives <= 0 ? 'HR would like a word.' : pick(CAUGHT_LINES), 'alarm', 3, 1500);
+    ui.toast(out ? 'HR would like a word.' : pick(CAUGHT_LINES), 'alarm', 3, 1500);
   }
 
   end(kind) {
     this.wasKissing = false; this.kissingNow = false;
-    this.resetStreak();
+    streak.reset(this);
     player.clear();
     const r = { kind, romance: this.romance, timeLeft: this.timeLeft, strikes: this.strikes, level: this.level };
     if (kind === 'win') {
       this.setState(S.WON);
       // Long streaks score more love points; harder levels add a bonus. The score picks the ending.
       const sc = CONFIG.score;
-      r.score = Math.max(0, Math.round(this.lovePoints + this.timeLeft * sc.perSecondLeft - this.strikes * sc.perCatch + this.level.scoreBonus));
+      r.score = Math.max(0, Math.round(this.lovePoints + this.timeLeft * sc.perSecondLeft - this.strikes * sc.perCatch + this.rules.scoreBonus));
       r.ending = CONFIG.endings.find(x => r.score >= x.min).key;
       const key = 'best.' + this.levelId;
       const best = store.get(key, null);

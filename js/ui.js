@@ -35,7 +35,7 @@ const ui = {
       'toast', 'countdown', 'menu', 'pause', 'result', 'btnPlay', 'btnSoundMenu', 'bestLine', 'btnResume', 'btnRestart', 'btnQuit',
       'btnAgain', 'btnMenu', 'resultHead', 'resultTitle', 'resultSub', 'resultEnding', 'resultStats', 'resultStamp', 'kissBtn']
       .forEach(id => { this.el[id] = $(id); });
-    this.el.strikes.innerHTML = CHANCE_SVG.repeat(CONFIG.maxLives);
+    this.el.strikes.innerHTML = CHANCE_SVG.repeat(game.rules.lives.max);
     this.shownRomance = 0; this.lastPct = -1; this.lastTime = ''; this.lastTimerCls = ''; this.lastPulse = 0; this.toastTimer = null; this.toastPri = 0;
     this.syncSound();
     this.showBest();
@@ -56,8 +56,9 @@ const ui = {
   reset() {
     this.shownRomance = 0; this.lastPct = -1; this.lastTime = ''; this.lastPulse = 0;
     // Start lives are filled; the rest are dashed outlines until earned
-    this.el.strikes.querySelectorAll('.chance').forEach((c, i) => { c.classList.remove('lost', 'flash', 'gain'); c.classList.toggle('empty', i >= CONFIG.startLives); });
-    this.livesLabel(CONFIG.startLives);
+    const start = game.rules.lives.start;
+    this.el.strikes.querySelectorAll('.chance').forEach((c, i) => { c.classList.remove('lost', 'flash', 'gain'); c.classList.toggle('empty', i >= start); });
+    this.livesLabel(start);
     this.el.countdown.innerHTML = '';
     this.hideToast(true);
   },
