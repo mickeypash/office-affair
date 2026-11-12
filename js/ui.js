@@ -14,7 +14,6 @@ const ui = {
     this.el.strikes.innerHTML = CHANCE_SVG.repeat(CONFIG.maxStrikes);
     this.shownRomance = 0; this.lastPct = -1; this.lastTime = ''; this.lastTimerCls = ''; this.lastPulse = 0; this.toastTimer = null; this.toastPri = 0;
     this.syncSound();
-    this.initLevels();
     this.showBest();
   },
   syncSound() {
@@ -24,21 +23,9 @@ const ui = {
     this.el.btnSoundMenu.textContent = on ? 'Sound: on' : 'Sound: off';
     this.el.btnSoundMenu.setAttribute('aria-pressed', String(on));
   },
-  /* Level picker on the menu: one radio per level, saved when changed. */
-  initLevels() {
-    const box = $('levels');
-    box.innerHTML = '<legend class="sr-only">Level</legend>' + LEVEL_ORDER.map(id => {
-      const lv = LEVELS[id];
-      return `<label class="level"><input type="radio" name="level" value="${id}"${id === game.levelId ? ' checked' : ''}>` +
-        `<span class="lv-day">${lv.name}</span><span class="lv-diff">${lv.difficulty}</span></label>`;
-    }).join('');
-    box.addEventListener('change', e => { game.setLevel(e.target.value); this.showBest(); });
-  },
   showBest() {
-    const lv = game.level;
-    $('levelBlurb').textContent = lv.blurb;
     const b = store.get('best.' + game.levelId, null);
-    this.el.bestLine.textContent = b && b.score ? `Best on ${lv.name}: ${b.rank}, ${b.score} pts` : `No ${lv.name} win yet.`;
+    this.el.bestLine.textContent = b && b.score ? `Best result: ${b.rank}, ${b.score} pts` : '';
   },
   reset() {
     this.shownRomance = 0; this.lastPct = -1; this.lastTime = ''; this.lastPulse = 0;
@@ -98,37 +85,37 @@ const ui = {
     if (v === 'GO!') setTimeout(() => { if (span.parentNode) span.remove(); }, 900);
   },
   showOverlay(name) {
-    ['menu', 'pause', 'result', 'customise'].forEach(n => $(n).classList.toggle('show', n === name));
-    document.body.classList.toggle('customising', name === 'customise');
+    ['menu', 'select', 'pause', 'result', 'customise'].forEach(n => $(n).classList.toggle('show', n === name));
+    document.body.classList.toggle('customising', name === 'customise' || name === 'select');
     if (typeof layout === 'function') layout();
-    const focusMap = { menu: 'btnPlay', pause: 'btnResume', result: 'btnAgain', customise: 'tabPlayer' };
+    const focusMap = { menu: 'btnPlay', pause: 'btnResume', result: 'btnAgain', select: 'btnStart', customise: 'custDone' };
     if (name && focusMap[name]) setTimeout(() => $(focusMap[name]).focus({ preventScroll: true }), 30);
   },
   showResult(r) {
     const e = this.el;
     const rows = [];
     if (r.kind === 'win') {
-      e.resultHead.innerHTML = `<div><b>TO:</b> ${esc(cast.fullName('player'))} &amp; ${esc(cast.fullName('partner'))}</div>` + '<div><b>FROM:</b> Department of Hearts</div><div><b>RE:</b> Performance review</div>';
+      e.resultHead.innerHTML = `<div><b>TO:</b> ${esc(cast.girlName())} &amp; ${esc(cast.guyName())}</div>` + '<div><b>FROM:</b> Department of Hearts</div><div><b>RE:</b> Performance review</div>';
       e.resultTitle.textContent = 'LOVE PROMOTION! 💘';
       e.resultSub.textContent = 'Your romance has excellent quarterly results.';
       e.resultRank.innerHTML = `${r.rank}: ${r.title}` + (r.newBest ? '<span class="newbest">New best</span>' : '');
       e.resultRank.style.display = '';
-      rows.push(['Level', `${r.level.name} (${r.level.difficulty})`], ['Time remaining', fmtTime(r.timeLeft)], ['Times caught', String(r.strikes)], ['Score', `${r.score} pts`]);
-      if (r.best) rows.push([`Best on ${r.level.name}`, `${r.best.rank}, ${r.best.score} pts`]);
+      rows.push(['Time remaining', fmtTime(r.timeLeft)], ['Times caught', String(r.strikes)], ['Score', `${r.score} pts`]);
+      if (r.best) rows.push(['Best result', `${r.best.rank}, ${r.best.score} pts`]);
       e.resultStamp.textContent = 'APPROVED'; e.resultStamp.className = 'stamp';
     } else if (r.kind === 'hr') {
-      e.resultHead.innerHTML = `<div><b>TO:</b> ${esc(cast.fullName('player'))}</div>` + '<div><b>FROM:</b> Human Resources</div><div><b>RE:</b> Mandatory meeting, 9 am</div>';
+      e.resultHead.innerHTML = `<div><b>TO:</b> ${esc(cast.girlName())}</div>` + '<div><b>FROM:</b> Human Resources</div><div><b>RE:</b> Mandatory meeting, 9 am</div>';
       e.resultTitle.textContent = 'MEETING WITH HR 📋';
       e.resultSub.textContent = 'Your workplace conduct is under review.';
       e.resultRank.style.display = 'none';
-      rows.push(['Level', `${r.level.name} (${r.level.difficulty})`], ['Final romance', `${Math.floor(r.romance)}%`], ['Times caught', String(r.strikes)], ['Time remaining', fmtTime(r.timeLeft)]);
+      rows.push(['Final romance', `${Math.floor(r.romance)}%`], ['Times caught', String(r.strikes)], ['Time remaining', fmtTime(r.timeLeft)]);
       e.resultStamp.textContent = 'UNDER REVIEW'; e.resultStamp.className = 'stamp red';
     } else {
       e.resultHead.innerHTML = '<div><b>TO:</b> All staff</div><div><b>FROM:</b> Facilities</div><div><b>RE:</b> Building closes at 5 pm</div>';
       e.resultTitle.textContent = 'CLOCKED OUT 💔';
       e.resultSub.textContent = 'Another day, another missed connection.';
       e.resultRank.style.display = 'none';
-      rows.push(['Level', `${r.level.name} (${r.level.difficulty})`], ['Final romance', `${Math.floor(r.romance)}%`], ['Times caught', String(r.strikes)]);
+      rows.push(['Final romance', `${Math.floor(r.romance)}%`], ['Times caught', String(r.strikes)]);
       e.resultStamp.textContent = '5:00 PM'; e.resultStamp.className = 'stamp red';
     }
     e.resultStats.innerHTML = rows.map(([a, b]) => `<tr><td>${a}</td><td>${b}</td></tr>`).join('');

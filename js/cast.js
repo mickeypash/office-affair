@@ -1,15 +1,14 @@
 'use strict';
-/* The cast: names and looks for the two coworkers, saved in localStorage. */
-const ROLES = ['player', 'partner'];
+/* The cast: who you play (Gabi, Vix or your own girl) and tonight's random guy.
+   Your pick and your custom girl are saved in localStorage. The guy is new every round. */
+const PICKS = ['gabi', 'vix', 'custom'];
 const HEX = /^#[0-9a-f]{6}$/i;
 
-/* Return a clean copy of a cast member. Unknown or bad values fall back to the defaults. */
-function cleanMember(m, def) {
-  const out = { ...def };
+/* Return a clean copy of a custom girl. Unknown or bad values fall back to the defaults. */
+function cleanGirl(m) {
+  const out = { ...DEFAULT_CUSTOM };
   if (!m || typeof m !== 'object') return out;
-  const text = (v, max) => (typeof v === 'string' ? v.replace(/\s+/g, ' ').trim().slice(0, max) : '');
-  out.name = text(m.name, NAME_MAX) || def.name;
-  out.team = text(m.team, TEAM_MAX) || def.team;
+  if (typeof m.name === 'string') out.name = m.name.replace(/\s+/g, ' ').trim().slice(0, NAME_MAX) || DEFAULT_CUSTOM.name;
   for (const k of ['skin', 'hair', 'outfitColour']) if (HEX.test(m[k])) out[k] = m[k].toUpperCase();
   if (m.hairStyle in HAIR_STYLES) out.hairStyle = m.hairStyle;
   if (m.outfit in OUTFITS) out.outfit = m.outfit;
@@ -18,29 +17,33 @@ function cleanMember(m, def) {
 }
 
 const cast = {
-  data: null,
+  pick: 'gabi',      // gabi | vix | custom
+  custom: null,      // the "Make your own" girl, or null until she is made
+  guy: null,
   load() {
-    const saved = store.get('cast', {}) || {};
-    this.data = {};
-    for (const r of ROLES) this.data[r] = cleanMember(saved[r], DEFAULT_CAST[r]);
+    const p = store.get('pick', 'gabi');
+    const saved = store.get('customGirl', null);
+    this.custom = saved ? cleanGirl(saved) : null;
+    this.pick = PICKS.includes(p) && (p !== 'custom' || this.custom) ? p : 'gabi';
+    this.rollGuy();
   },
-  save() { store.set('cast', this.data); },
-  get(role) { return this.data[role]; },
-  set(role, key, value) {
-    this.data[role] = cleanMember({ ...this.data[role], [key]: value }, DEFAULT_CAST[role]);
-    this.save();
-  },
-  reset(role) { this.data[role] = { ...DEFAULT_CAST[role] }; this.save(); },
-  shuffle(role) {
+  setPick(p) { if (PICKS.includes(p) && (p !== 'custom' || this.custom)) { this.pick = p; store.set('pick', p); } },
+  girl() { return this.pick === 'custom' ? this.custom : GIRLS[this.pick]; },
+  girlName() { return this.girl().name; },
+  guyName() { return this.guy.name; },
+  rollGuy() { this.guy = randomGuy(); return this.guy; },
+  // Custom girl editing
+  ensureCustom() { if (!this.custom) { this.custom = { ...DEFAULT_CUSTOM }; this.saveCustom(); } return this.custom; },
+  setCustom(key, value) { this.custom = cleanGirl({ ...this.custom, [key]: value }); this.saveCustom(); },
+  resetCustom() { this.custom = { ...DEFAULT_CUSTOM }; this.saveCustom(); },
+  shuffleCustom() {
     const keys = o => Object.keys(o);
-    this.data[role] = cleanMember({
-      ...this.data[role],
-      skin: pick(SKIN_TONES)[0], hair: pick(HAIR_COLOURS)[0], outfitColour: pick(OUTFIT_COLOURS)[0],
-      hairStyle: pick(keys(HAIR_STYLES)), outfit: pick(keys(OUTFITS)), glasses: Math.random() < 0.4,
-    }, DEFAULT_CAST[role]);
-    this.save();
+    this.custom = cleanGirl({
+      ...this.custom, skin: pick(SKIN_TONES)[0], hair: pick(HAIR_COLOURS)[0], outfitColour: pick(OUTFIT_COLOURS)[0],
+      hairStyle: pick(keys(HAIR_STYLES)), outfit: pick(keys(OUTFITS)), glasses: Math.random() < 0.3,
+    });
+    this.saveCustom();
   },
-  fullName(role) { return this.data[role].name; },
-  firstName(role) { return this.data[role].name.split(' ')[0]; },
+  saveCustom() { store.set('customGirl', this.custom); },
 };
 cast.load();

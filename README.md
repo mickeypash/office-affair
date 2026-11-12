@@ -22,17 +22,9 @@ Open `index.html` in a modern browser (Chrome, Edge, Firefox or Safari). Double-
 - **Dashed ? while the boss stretches** (only after 70%): this is a bluff. The boss will not turn.
 - Three strikes ends the game with a meeting with HR. If the clock gets to 5 pm first, you are clocked out.
 
-Pick a level on the title screen:
+A round lasts 75 seconds. The boss gets less predictable as the meter fills (0–30%, 30–70%, 70–100%). You get a rank (S, A, B or C) when you win. Your best result, your pick and your sound setting are saved in `localStorage`.
 
-| Level | Difficulty | Workday | What changes |
-|---|---|---|---|
-| Friday | Easy | 85 s | Long distractions, slow turns, rare bluffs |
-| Wednesday | Normal | 75 s | The original balance |
-| Monday | Hard | 62 s | Short distractions, quick turns, frequent bluffs |
-
-Within each level, the boss gets less predictable as the meter fills (0–30%, 30–70%, 70–100%). You get a rank (S, A, B or C) when you win. Scores scale time left to a 75-second day and add a bonus on harder levels, so scores compare across levels. Your best result for each level, your level choice and your sound setting are saved in `localStorage`.
-
-To tune or add a level, edit `LEVELS` and `LEVEL_ORDER` in `js/config.js`.
+Tuning lives in `LEVELS` in `js/config.js`. There is one level for now. The Friday (easy) and Monday (hard) levels from PR #3 are in git history.
 
 ## Project structure
 
@@ -41,16 +33,16 @@ To tune or add a level, edit `LEVELS` and `LEVEL_ORDER` in `js/config.js`.
 | `index.html` | Page markup: HUD, the SVG office scene, overlays |
 | `css/style.css` | All styles |
 | `js/util.js` | Small helpers and the `localStorage` wrapper |
-| `js/config.js` | Game rules, difficulty tuning, character palettes and default cast |
-| `js/cast.js` | Loads, checks and saves the cast (names and looks) |
-| `js/art.js` | SVG builders for the coworkers, hair styles, outfits, boss and walker |
+| `js/config.js` | Game rules, tuning, the leads, the guy's names and palettes |
+| `js/cast.js` | Your pick, your saved custom girl, and the random guy |
+| `js/art.js` | SVG builders for the characters, hair styles, outfits, the guy, the boss and the walker |
 | `js/audio.js` | Procedural sound effects (Web Audio) |
 | `js/player.js` | Input state (which keys and pointers are held) |
 | `js/manager.js` | The boss's state machine |
 | `js/renderer.js` | Animates the scene every frame |
 | `js/confetti.js` | Win confetti (canvas) |
 | `js/ui.js` | HUD, menus, result memos, toasts |
-| `js/customise.js` | The Customise screen |
+| `js/customise.js` | The "Who's clocking in?" picker and the "Make your own" editor |
 | `js/game.js` | Game lifecycle and finite-state machine |
 | `js/main.js` | Boot, layout, input wiring, main loop |
 
@@ -59,21 +51,19 @@ The scripts are plain `<script>` tags, not ES modules. Browsers block modules on
 ## Notes
 
 - Plain HTML, CSS and JavaScript. The graphics are inline SVG and the sounds come from the Web Audio API. There are no external assets or dependencies.
-- On Wednesday, romance fills at 3.75% per second. The spec's starting value of 2% per second made the round too hard. The levels were tuned with a simulation of an attentive player.
+- Romance fills at 3.75% per second. The spec's starting value of 2% per second made the round too hard.
 - The game respects `prefers-reduced-motion`. It pauses when the tab is hidden or loses focus, and it clears held keys so no input gets stuck.
 
-## Customise
+## Who's clocking in?
 
-Click **Customise** on the title screen. You can change both coworkers:
+Press **Play** and pick who you play:
 
-- name and team (shown on the desk name plates and in the memos)
-- skin tone, hair style (curls, bun, bob, crop, long, shaved) and hair colour
-- outfit (cardigan, vest and tie, turtleneck) and outfit colour
-- glasses
+- **Gabi** or **Vix**, the two leads, with fixed looks.
+- **Make your own**: set a name, skin tone, hair style and colour, outfit and colour, and glasses. Every colour row also has a colour picker. Your girl is saved in `localStorage` and stays on her card. Use **Edit your girl** to change her.
 
-Every colour row also has a colour picker for any colour. Changes appear live in the office behind the panel and are saved in `localStorage`. **Surprise me** picks a random look, and **Reset** restores the default.
+The guy is a surprise. Every round brings a new random guy, with his name on the desk plate (Banana, Smoothie, Straw, Tree, Kiwi, Oat Milk, Pickle, Waffle or Mango). **Play again** keeps your pick and brings a new guy.
 
-To change the defaults or add colours, edit `DEFAULT_CAST` and the palettes in `js/config.js`. To add a hair style or an outfit, add a builder to `HAIR_ART` or `OUTFIT_ART` in `js/art.js` and its label to `HAIR_STYLES` or `OUTFITS` in `js/config.js`.
+To change the leads, edit `GIRLS` in `js/config.js`. Guy names, skin tones, hair and outfit colours are in the same file. To add a hair style or an outfit, add a builder to `HAIR_ART`, `OUTFIT_ART` or `GUY_OUTFITS` in `js/art.js`, and add its label to `HAIR_STYLES` or `OUTFITS` for the editor.
 
 ## Play online
 

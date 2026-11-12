@@ -11,7 +11,7 @@ const CAUGHT_LINES = ['HR would like a word.', "That spreadsheet won't save you.
 class Game {
   constructor() {
     this.state = S.MENU; this.resumeTo = null;
-    this.levelId = LEVELS[store.get('level', DEFAULT_LEVEL)] ? store.get('level', DEFAULT_LEVEL) : DEFAULT_LEVEL;
+    this.levelId = DEFAULT_LEVEL;
     // Older versions kept one best score. Treat it as the Wednesday (normal) best.
     const legacy = store.get('best', null);
     if (legacy && !store.get('best.wednesday', null)) store.set('best.wednesday', legacy);
@@ -24,12 +24,13 @@ class Game {
     this.cdT = 0; this.lastCd = null; this.endT = 0; this.result = null; this.lastSec = 999; this.said50 = false; this.said85 = false;
   }
   get level() { return LEVELS[this.levelId]; }
-  setLevel(id) { if (LEVELS[id]) { this.levelId = id; store.set('level', id); if (this.state === S.MENU) this.timeLeft = this.level.duration; } }
   setState(s) { this.state = s; document.body.dataset.state = s; }
   tier() { const t = this.level.tiers; return t.find(x => this.romance < x.until) || t[t.length - 1]; }
 
   start() {
     sfx.unlock();
+    cast.rollGuy();            // a new random guy every round
+    renderer.buildChar('R');
     this.resetValues();
     this.manager.reset();
     player.clear();
@@ -46,7 +47,7 @@ class Game {
     this.resumeTo = this.state;
     this.setState(S.PAUSED);
     player.clear();
-    $('pauseTo').textContent = cast.fullName('player');
+    $('pauseTo').textContent = cast.girlName();
     ui.showOverlay('pause');
   }
   resume() {
