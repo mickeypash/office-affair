@@ -232,8 +232,16 @@ kbd {
 .pick-plus { font-size: 54px; line-height: 1; color: rgba(255,255,255,.8); }
 .pick-name { text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: clamp(13px, 3.4vw, 17px); }
 .pick-card.empty .pick-name { white-space: normal; line-height: 1.1; }
-.link-btn { border: 0; background: none; padding: 2px 0; color: var(--pink-soft); font-weight: 800; font-size: 14px; text-decoration: underline; }
-.select-actions { display: flex; gap: 10px; align-items: center; margin-top: 14px; }
+.pick-slot { position: relative; }
+.pick-slot .pick-card { width: 100%; }
+.restyle {
+  position: absolute; top: -9px; right: -9px; width: 40px; height: 40px; padding: 0; border-radius: 50%;
+  display: grid; place-items: center; background: var(--pink); border: 3px solid var(--ink);
+  box-shadow: 2px 3px 0 var(--ink); transform: rotate(-12deg); transition: transform .15s;
+}
+.restyle svg { width: 24px; height: 24px; }
+.restyle:hover { transform: rotate(8deg) scale(1.08); }
+.restyle[hidden] { display: none; }.select-actions { display: flex; gap: 10px; align-items: center; margin-top: 14px; }
 
 /* ---------- Customise ---------- */
 #customise, #select { align-items: center; justify-content: flex-start; padding: 16px; pointer-events: none; }

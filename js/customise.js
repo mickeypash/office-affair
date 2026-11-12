@@ -11,17 +11,19 @@ function portraitSVG(m) {
 const select = {
   el: {},
   init() {
-    ['select', 'btnStart', 'btnSelectBack', 'btnEditCustom', 'pickCustom', 'pickCustomName'].forEach(id => { this.el[id] = $(id); });
+    ['select', 'btnStart', 'btnSelectBack', 'btnRestyle', 'pickCustom', 'pickCustomName'].forEach(id => { this.el[id] = $(id); });
     this.cards = [...document.querySelectorAll('.pick-card')];
     this.cards.forEach(c => c.addEventListener('click', () => this.choose(c.dataset.pick)));
     this.el.btnStart.addEventListener('click', () => game.start());
     this.el.btnSelectBack.addEventListener('click', () => this.close());
-    this.el.btnEditCustom.addEventListener('click', () => customise.open());
+    this.el.btnRestyle.addEventListener('click', () => customise.open());
   },
   get isOpen() { return this.el.select.classList.contains('show'); },
   open() { this.render(); ui.showOverlay('select'); },
   close() { ui.showOverlay('menu'); },
   choose(p) {
+    // Tapping your girl's card again (or the hanger badge) opens her wardrobe.
+    if (p === 'custom' && cast.custom && cast.pick === 'custom') { customise.open(); return; }
     if (p === 'custom' && !cast.custom) { cast.ensureCustom(); cast.setPick('custom'); renderer.buildChar('L'); customise.open(); return; }
     cast.setPick(p);
     renderer.buildChar('L');
@@ -42,7 +44,7 @@ const select = {
       this.el.pickCustomName.textContent = 'Make your own';
       this.el.pickCustom.classList.add('empty');
     }
-    this.el.btnEditCustom.hidden = !cast.custom;
+    this.el.btnRestyle.hidden = !cast.custom;
   },
 };
 
