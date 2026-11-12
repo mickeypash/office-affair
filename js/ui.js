@@ -60,19 +60,32 @@ const ui = {
     this.el.kissBtn.classList.toggle('pressed', player.holding && (g.state === S.PLAYING || g.state === S.COUNTDOWN));
   },
   livesLabel(n) { this.el.strikes.setAttribute('aria-label', n === 1 ? '1 life' : `${n} lives`); },
+  // Hearts always read left to right: filled (current lives), then cracked (lost), then dashed (not earned yet).
+  arrangeLives(filled, lost, anim) {
+    [...this.el.strikes.querySelectorAll('.chance')].forEach((c, i) => {
+      c.classList.remove('lost', 'empty', 'flash', 'gain');
+      if (i >= filled + lost) c.classList.add('empty');
+      else if (i >= filled) c.classList.add('lost');
+      if (anim === 'gain' && i === filled - 1 && !REDUCED) { void c.getBoundingClientRect(); c.classList.add('gain'); }
+      if (anim === 'flash' && i === filled) c.classList.add('flash');
+    });
+  },
+  lifeCounts() {
+    const all = [...this.el.strikes.querySelectorAll('.chance')];
+    const lost = all.filter(c => c.classList.contains('lost')).length, empty = all.filter(c => c.classList.contains('empty')).length;
+    return { filled: all.length - lost - empty, lost };
+  },
   loseLife(n) {
-    const full = [...this.el.strikes.querySelectorAll('.chance:not(.lost):not(.empty)')];
-    const c = full[full.length - 1]; // crack from the right
-    if (c) { c.classList.remove('gain'); c.classList.add('lost', 'flash'); }
+    const { filled, lost } = this.lifeCounts();
+    if (filled > 0) this.arrangeLives(filled - 1, lost + 1, 'flash');
     this.livesLabel(n);
   },
   gainLife(n) {
-    // Fill the next slot not yet earned (or refill a lost one)
-    const c = this.el.strikes.querySelector('.chance.empty') || this.el.strikes.querySelector('.chance.lost');
-    if (c) {
-      c.classList.remove('empty', 'lost', 'flash', 'gain');
-      if (!REDUCED) { void c.getBoundingClientRect(); c.classList.add('gain'); }
-    }
+    // Use a slot not yet earned if there is one, otherwise heal a cracked heart.
+    const { filled, lost } = this.lifeCounts();
+    const slots = this.el.strikes.querySelectorAll('.chance').length;
+    if (filled + lost < slots) this.arrangeLives(filled + 1, lost, 'gain');
+    else if (lost > 0) this.arrangeLives(filled + 1, lost - 1, 'gain');
     this.livesLabel(n);
   },
   toast(msg, kind = '', pri = 1, ms = 1700) {
