@@ -2,10 +2,11 @@
 /* Every character, as data.
 
    To add a girl you can play, add an entry to CHARACTERS:
-     { id, name, hidden, look: { skin, hairStyle, hair, outfit, outfitColour, glasses, makeup, mouth, mood }, notes }
+     { id, name, hidden, look: { skin, hairStyle, hair, outfit, outfitColour, glasses, makeup, mouth, mood, earrings }, notes }
    - id: short and unique. It is saved as the pick and used as the card's data-pick.
    - look: the same keys as the "Make your own" girl. hairStyle and outfit are ids from HAIR_ART / OUTFIT_ART in art.js.
-     mouth is 'pout', 'smirk' or null. mood 'mean' gives heavy lids and sloped brows.
+     mouth is 'pout', 'smirk' or null. mood 'mean' gives heavy lids and sloped brows. earrings: true adds drop earrings.
+     shoulderWaves and longStraight shade the hair colour, so give them a hex colour, not a gradient.
    - Cards on "Who's clocking in?" follow the order of CHARACTERS, with "Make your own" last.
    - hidden: true keeps her off the picker, and a saved pick of her falls back to the first visible girl.
      Add ?cast=all to the page URL to show hidden characters while you work on them. */
@@ -21,9 +22,14 @@ const CHARACTERS = [
     notes: 'Lead, drawn from the reference photo. Black blazer, resting mean face and a smirk. Never tongue out.',
   },
   {
-    id: 'newstarter', name: 'New Starter', hidden: true,
-    look: { skin: '#C98A5E', hairStyle: 'curls', hair: '#3A2730', outfit: 'cardigan', outfitColour: '#3E9C92', glasses: true, makeup: true, mouth: null },
-    notes: 'Placeholder that keeps hidden characters tested. Replace or delete her when a real new girl arrives.',
+    id: 'robin', name: 'Robin', hidden: true,
+    look: { skin: '#F3C8A5', hairStyle: 'shoulderWaves', hair: '#A9733F', outfit: 'buttonTop', outfitColour: '#3F5D9E', glasses: false, makeup: false, mouth: null },
+    notes: 'From the old single-file game (Marketing). Shoulder-length light-brown waves, blue button-front top.',
+  },
+  {
+    id: 'sasha', name: 'Sasha', hidden: true,
+    look: { skin: '#F5D3BA', hairStyle: 'longStraight', hair: '#2A2434', outfit: 'coat', outfitColour: '#F5F1E8', glasses: false, makeup: false, mouth: null, earrings: true },
+    notes: 'From the old single-file game (HR). Long straight black hair, white coat over a black top, drop earrings.',
   },
 ];
 
@@ -35,6 +41,7 @@ const CUSTOM_GIRL = {
 
 /* The guy: a new random one every round, built from these pools by randomGuy() in art.js. */
 const GUYS = {
+  namedChance: 0.25, // chance that tonight's guy is a visible named guy from GUY_CHARACTERS (when there is one)
   names: ['Banana', 'Smoothie', 'Straw', 'Tree', 'Pickle', 'Mango'],
   skin: ['#F7DCC8', '#F2CCB0', '#EDC1A1', '#E8B896', '#F5D5BE'],
   hair: ['#2A1E1A', '#4A3226', '#6B4A33', '#8C6A45', '#C9A06A', '#9A4E2C', '#1C1A1F'],
@@ -42,6 +49,18 @@ const GUYS = {
   colours: ['#7C8A6A', '#3E5068', '#C8B79A', '#8C3B3B', '#2F4A3E', '#E9E1D3', '#6B5B8C', '#B5651D'],
   glasses: ['#2B2340', '#7A4A2E', '#1C1A1F'],
 };
+
+/* Named guys. Same idea as CHARACTERS: each one has a hidden flag.
+   A visible named guy can be tonight's guy (see GUYS.namedChance); with ?cast=all hidden ones can be too.
+   look keys: skin, hairStyle (HAIR_ART id), hair, outfitKey (GUY_OUTFITS id), colour, facial ('none', 'stubble', 'beard'),
+   glasses (frame colour or null), glassesShape ('round' or 'rect'). */
+const GUY_CHARACTERS = [
+  {
+    id: 'alex', name: 'Alex', hidden: true,
+    look: { skin: '#E3B48F', hairStyle: 'swept', hair: '#D9D8E2', outfitKey: 'biker', colour: '#3A3443', facial: 'none', glasses: '#2B2340', glassesShape: 'rect' },
+    notes: 'From the old single-file game (Engineering). Silver swept-back hair, rectangular glasses, leather jacket over a black tee.',
+  },
+];
 
 /* ---- The "Make your own" wardrobe ----
    Colours are [hex, accessible name]. Style ids match HAIR_ART / OUTFIT_ART in art.js. */
@@ -64,6 +83,7 @@ const NAME_MAX = 14;
 /* Who shows on the picker: every character that is not hidden, or all of them with ?cast=all. */
 const SHOW_HIDDEN = new URLSearchParams(location.search).get('cast') === 'all';
 const PLAYABLE = CHARACTERS.filter(c => SHOW_HIDDEN || !c.hidden);
+const NAMED_GUYS = GUY_CHARACTERS.filter(c => SHOW_HIDDEN || !c.hidden);
 
 /* Old names, derived from the data above. GIRLS has every character (hidden too); PLAYABLE decides who can be picked. */
 const GIRLS = Object.fromEntries(CHARACTERS.map(c => [c.id, { name: c.name, ...c.look }]));
