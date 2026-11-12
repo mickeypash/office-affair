@@ -269,6 +269,18 @@ function guyOpts(g, dir) {
 function managerSVG() {
   const skin = '#E8B896', hair = '#B3B0C6', blazer = '#4A4560', chair = '#5E527F';
   const head = `<circle cx="0" cy="-255" r="70" fill="${skin}" ${SW(7)}/>`;
+  const trousers = '#35304A', shoe = '#1E1A22';
+  const seat = `<rect x="-104" y="10" width="208" height="26" rx="11" fill="${chair}" ${SW(6)}/>`;
+  // Shins and shoes carry classes so the renderer can keep the feet on the floor when the boss stands up.
+  const shoes = (pts, rx) => `<g class="shoes">${pts.map(([x, y]) => `<ellipse cx="${x}" cy="${y}" rx="${rx}" ry="13" fill="${shoe}" ${SW(5)}/><path d="M${x - rx * 0.5},${y - 6} q${rx * 0.3},-4 ${rx * 0.6},-2" fill="none" stroke="#fff" stroke-opacity=".35" stroke-width="3" stroke-linecap="round"/>`).join('')}</g>`;
+  const shins = (top, rects) => `<g class="shins" data-top="${top}" data-len="${120 - top}">${rects.map(([x, w]) => `<rect x="${x}" y="${top}" width="${w}" height="${120 - top}" rx="12" fill="${trousers}" ${SW(6)}/>`).join('')}</g>`;
+  const legsFront = `<g class="legs">${seat}${shins(36, [[-66, 44], [22, 44]])}
+    <rect x="-80" y="-4" width="74" height="52" rx="24" fill="${trousers}" ${SW(6)}/><rect x="6" y="-4" width="74" height="52" rx="24" fill="${trousers}" ${SW(6)}/>
+    ${shoes([[-46, 124], [46, 124]], 32)}</g>`;
+  const legsBack = `<g class="legs">${shins(44, [[-62, 34], [28, 34]])}${shoes([[-46, 124], [46, 124]], 22)}${seat}</g>`;
+  const legsSide = `<g class="legs">${seat}${shins(22, [[-100, 44]])}
+    <rect x="-100" y="-8" width="112" height="46" rx="22" fill="${trousers}" ${SW(6)}/>
+    ${shoes([[-96, 124]], 38)}</g>`;
   return `
   <g id="mgrChairBase" ${SW(7)}>
     <path d="M0,10 L0,112" stroke-width="20"/><path d="M0,10 L0,112" stroke="#3D3557" stroke-width="10"/>
@@ -277,6 +289,7 @@ function managerSVG() {
   </g>
   <!-- BACK VIEW -->
   <g id="mgrBack">
+    ${legsBack}
     <g id="actStretchArms" display="none">
       ${limb('M-80,-168 Q-150,-230 -150,-322', blazer, 38)}${limb('M80,-168 Q150,-230 150,-322', blazer, 38)}
       <circle cx="-150" cy="-332" r="18" fill="${skin}" ${SW(6)}/><circle cx="150" cy="-332" r="18" fill="${skin}" ${SW(6)}/>
@@ -318,6 +331,7 @@ function managerSVG() {
   </g>
   <!-- SIDE VIEW (turning toward the couple) -->
   <g id="mgrSide" display="none">
+    ${legsSide}
     <path d="M-100,20 L-94,-150 Q-90,-186 -50,-192 L50,-192 Q86,-186 90,-150 L96,20 Z" fill="${blazer}" ${SW(7)}/>
     <path d="M-60,-192 L-38,-140 L-26,-192 Z" fill="#fff" ${SW(5)}/>
     <rect x="-20" y="-214" width="40" height="30" fill="${skin}" ${SW(6)}/>
@@ -336,6 +350,7 @@ function managerSVG() {
   <!-- FRONT VIEW (watching) -->
   <g id="mgrFront" display="none">
     <rect x="-106" y="-150" width="212" height="174" rx="48" fill="${chair}" ${SW(7)}/>
+    ${legsFront}
     <path d="M-110,20 L-102,-150 Q-98,-186 -56,-192 L56,-192 Q98,-186 102,-150 L110,20 Z" fill="${blazer}" ${SW(7)}/>
     <path d="M-36,-192 L0,-112 L36,-192 Z" fill="#fff" ${SW(5)}/>
     <path d="M-10,-186 L10,-186 L15,-130 L0,-112 L-15,-130 Z" fill="#C2385A" ${SW(5)}/>

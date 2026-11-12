@@ -360,6 +360,18 @@ class Renderer {
     const fidget = (pose === 'side' && icon === 'warn' && !REDUCED) ? Math.sin(t * 30) * 1.5 : 0;
     const stretchRise = stretch ? -10 - Math.sin(t * 4) * 4 : 0;
     e.mgrBody.setAttribute('transform', `translate(${fidget.toFixed(2)},${(rise + stretchRise).toFixed(2)}) scale(${sx.toFixed(3)},1)`);
+    // Keep the boss's feet on the floor when the body rises (standing up, stretching): stretch shins, drop shoes.
+    const lift = rise + stretchRise;
+    if (lift !== this.lastLift || pose !== this.lastLegPose) {
+      this.lastLift = lift; this.lastLegPose = pose;
+      const poseEl = pose === 'back' ? e.mgrBack : pose === 'side' ? e.mgrSide : e.mgrFront;
+      const sh = poseEl.querySelector('.shins'), so = poseEl.querySelector('.shoes');
+      if (sh && so) {
+        const top = +sh.dataset.top, len = +sh.dataset.len, k = (len - lift) / len;
+        sh.setAttribute('transform', `translate(0,${top}) scale(1,${k.toFixed(4)}) translate(0,${-top})`);
+        so.setAttribute('transform', `translate(0,${(-lift).toFixed(2)})`);
+      }
+    }
 
     // icons
     vis(e.warnIcon, icon === 'warn'); vis(e.fakeIcon, icon === 'fake');
