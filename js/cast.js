@@ -1,7 +1,8 @@
 'use strict';
-/* The cast: who you play (Gabi, Vix or your own girl) and tonight's random guy.
-   Your pick and your custom girl are saved in localStorage. The guy is new every round. */
-const PICKS = ['gabi', 'vix', 'custom'];
+/* The cast: who you play (a girl from CHARACTERS or your own girl) and tonight's random guy.
+   Your pick and your custom girl are saved in localStorage. The guy is new every round.
+   Only visible characters (PLAYABLE) can be picked; a saved pick of anyone else falls back to the first one. */
+const PICKS = [...PLAYABLE.map(c => c.id), 'custom'];
 const HEX = /^#[0-9a-f]{6}$/i;
 
 /* Return a clean copy of a custom girl. Unknown or bad values fall back to the defaults. */
@@ -17,14 +18,14 @@ function cleanGirl(m) {
 }
 
 const cast = {
-  pick: 'gabi',      // gabi | vix | custom
+  pick: PICKS[0],    // a PLAYABLE id, or custom
   custom: null,      // the "Make your own" girl, or null until she is made
   guy: null,
   load() {
-    const p = store.get('pick', 'gabi');
+    const p = store.get('pick', PICKS[0]);
     const saved = store.get('customGirl', null);
     this.custom = saved ? cleanGirl(saved) : null;
-    this.pick = PICKS.includes(p) && (p !== 'custom' || this.custom) ? p : 'gabi';
+    this.pick = PICKS.includes(p) && (p !== 'custom' || this.custom) ? p : PICKS[0];
     this.rollGuy();
   },
   setPick(p) { if (PICKS.includes(p) && (p !== 'custom' || this.custom)) { this.pick = p; store.set('pick', p); } },

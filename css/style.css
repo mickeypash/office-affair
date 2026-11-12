@@ -239,6 +239,9 @@ kbd {
 .pick-plus { font-size: 54px; line-height: 1; color: rgba(255,255,255,.8); }
 .pick-name { text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: clamp(13px, 3.4vw, 17px); }
 .pick-card.empty .pick-name { white-space: normal; line-height: 1.1; }
+/* Four or more cards (more girls in CHARACTERS, or ?cast=all): four across, wrapping after that, and names may take two lines. */
+.pick-cards:has(> :nth-child(4)) { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.pick-cards:has(> :nth-child(4)) .pick-name { white-space: normal; line-height: 1.1; }
 .pick-slot { position: relative; }
 .pick-slot .pick-card { width: 100%; }
 .restyle {
