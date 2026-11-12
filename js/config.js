@@ -10,6 +10,15 @@ const CONFIG = {
   returning: 0.4,        // seconds the boss takes to turn back
   // Unbroken kiss: x2 from `at2` s, x3 (fever) from `at3` s. fill = romance speed per multiplier; points = love points per second at x1.
   streak: { at2: 2, at3: 4, fill: [1, 1.3, 1.6], points: 100 },
+  // Win score = love points + `perSecondLeft` per second left - `perCatch` per time caught.
+  score: { perSecondLeft: 20, perCatch: 500 },
+  // Win endings, best first. A simulated player who never builds a streak scores about 2,950, a normal one about 4,050,
+  // and a greedy one who rides x3 streaks about 4,400 (simulated with no catches).
+  endings: [
+    { min: 4250, key: 'concert' },
+    { min: 3400, key: 'rose' },
+    { min: -1e9, key: 'drinks' },
+  ],
 };
 
 /* Levels. Each tier applies until the romance meter reaches `until` %.
