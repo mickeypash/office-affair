@@ -278,7 +278,7 @@ class Renderer {
     const h = this.heartPool.find(x => !x.alive);
     if (!h) return;
     const win = this.mode === 'win';
-    h.alive = true; h.life = 0; h.max = win ? rand(1.8, 2.6) : rand(1.3, 1.8);
+    h.alive = true; h.life = 0; h.side = 0; h.max = win ? rand(1.8, 2.6) : rand(1.3, 1.8);
     h.x = 800 + rand(-14, 14) + (win ? rand(-120, 120) : 0); h.y = 434 + rand(-8, 8);
     h.vx = rand(-40, 40); h.vy = -rand(110, 170); h.ph = rand(0, 6.28);
     h.s = rand(0.9, 1.5); h.rot = rand(-18, 18);
@@ -327,9 +327,16 @@ class Renderer {
       const k = h.life / h.max;
       h.x += (h.vx + (REDUCED ? 0 : Math.sin(h.life * 5 + h.ph) * 40)) * dt;
       h.y += h.vy * dt;
+      // Keep the boss visible: hearts rising into his head and warning-icon area drift out sideways and fade.
+      const dx = h.x - 800;
+      if (h.y < 380 && Math.abs(dx) < 95) {
+        if (!h.side) h.side = dx === 0 ? (Math.random() < 0.5 ? -1 : 1) : Math.sign(dx);
+        h.x += h.side * 260 * dt;
+      }
+      const nearBoss = h.y < 330 && Math.abs(h.x - 800) < 95;
       const sc = h.s * (k < 0.15 ? k / 0.15 : 1) * (0.7 + k * 0.4);
       h.node.setAttribute('transform', `translate(${h.x.toFixed(1)},${h.y.toFixed(1)}) rotate(${h.rot.toFixed(1)}) scale(${sc.toFixed(3)})`);
-      h.node.setAttribute('opacity', (k > 0.65 ? 1 - (k - 0.65) / 0.35 : 1).toFixed(2));
+      h.node.setAttribute('opacity', (nearBoss ? 0.25 : k > 0.65 ? 1 - (k - 0.65) / 0.35 : 1).toFixed(2));
     }
   }
   spawnNote() {
