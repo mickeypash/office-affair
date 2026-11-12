@@ -65,7 +65,7 @@ const DEFAULT_CUSTOM = {
 };
 
 /* ---- The guy: a new random one every round ---- */
-const GUY_NAMES = ['Banana', 'Smoothie', 'Straw', 'Tree', 'Kiwi', 'Oat Milk', 'Pickle', 'Waffle', 'Mango'];
+const GUY_NAMES = ['Banana', 'Smoothie', 'Straw', 'Tree', 'Pickle', 'Mango'];
 const GUY_SKIN = ['#F7DCC8', '#F2CCB0', '#EDC1A1', '#E8B896', '#F5D5BE'];
 const GUY_HAIR = ['#2A1E1A', '#4A3226', '#6B4A33', '#8C6A45', '#C9A06A', '#9A4E2C', '#1C1A1F'];
 const GUY_HAIR_STYLES = ['quiff', 'curtains', 'slick', 'tousled', 'crop', 'shaved', 'curls'];

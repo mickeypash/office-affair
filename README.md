@@ -61,7 +61,7 @@ Press **Play** and pick who you play:
 - **Gabi** or **Vix**, the two leads, with fixed looks.
 - **Make your own**: set a name, skin tone, hair style and colour, outfit and colour, and glasses. Every colour row also has a colour picker. Your girl is saved in `localStorage` and stays on her card. Use **Edit your girl** to change her.
 
-The guy is a surprise. Every round brings a new random guy, with his name on the desk plate (Banana, Smoothie, Straw, Tree, Kiwi, Oat Milk, Pickle, Waffle or Mango). **Play again** keeps your pick and brings a new guy.
+The guy is a surprise. Every round brings a new random guy, with his name on the desk plate (Banana, Smoothie, Straw, Tree, Pickle or Mango). **Play again** keeps your pick and brings a new guy.
 
 To change the leads, edit `GIRLS` in `js/config.js`. Guy names, skin tones, hair and outfit colours are in the same file. To add a hair style or an outfit, add a builder to `HAIR_ART`, `OUTFIT_ART` or `GUY_OUTFITS` in `js/art.js`, and add its label to `HAIR_STYLES` or `OUTFITS` for the editor.
 
