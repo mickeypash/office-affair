@@ -1,11 +1,5 @@
 'use strict';
 /* Game: lifecycle, finite-state machine */
-const RANKS = [
-  { min: 1400, rank: 'S-Rank', title: 'Corporate Casanova' },
-  { min: 1150, rank: 'A-Rank', title: 'Office Heartthrob' },
-  { min: 900,  rank: 'B-Rank', title: 'Romantic Intern' },
-  { min: -1e9, rank: 'C-Rank', title: 'HR Liability' },
-];
 const CAUGHT_LINES = ['HR would like a word.', "That spreadsheet won't save you.", 'HR would like a word.', 'Caught red-lipped!'];
 
 class Game {
@@ -185,15 +179,16 @@ class Game {
     const r = { kind, romance: this.romance, timeLeft: this.timeLeft, strikes: this.strikes, level: this.level };
     if (kind === 'win') {
       this.setState(S.WON);
-      // Time left is scaled to a 75 s day so scores compare across levels; harder levels add a bonus.
-      r.score = Math.round(this.romance * 10 + (this.timeLeft / this.level.duration) * 1500 - this.strikes * 250 + this.level.scoreBonus);
-      const rk = RANKS.find(x => r.score >= x.min);
-      r.rank = rk.rank; r.title = rk.title;
+      // Long streaks score more love points; harder levels add a bonus. The score picks the ending.
+      const sc = CONFIG.score;
+      r.score = Math.max(0, Math.round(this.lovePoints + this.timeLeft * sc.perSecondLeft - this.strikes * sc.perCatch + this.level.scoreBonus));
+      r.ending = CONFIG.endings.find(x => r.score >= x.min).key;
       const key = 'best.' + this.levelId;
       const best = store.get(key, null);
-      if (!best || r.score > best.score) {
+      // Bests saved before endings (with a rank) used another scale, so they are replaced.
+      if (!best || !best.ending || r.score > best.score) {
         r.newBest = true;
-        store.set(key, { score: r.score, rank: r.rank, timeLeft: Math.ceil(r.timeLeft), strikes: r.strikes });
+        store.set(key, { score: r.score, ending: r.ending, timeLeft: Math.ceil(r.timeLeft), strikes: r.strikes });
       }
       r.best = store.get(key, null);
       renderer.win(); sfx.win(); confetti.start(3.2);

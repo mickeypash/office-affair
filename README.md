@@ -25,7 +25,15 @@ Open `index.html` in a modern browser (Chrome, Edge, Firefox or Safari). Double-
 - You earn a life when the meter reaches 35%, and another at 70%. You can hold up to 3. Each catch costs a life.
 - If the clock gets to 5 pm first, you are clocked out.
 
-A round lasts 75 seconds. The boss gets less predictable as the meter fills (0–30%, 30–70%, 70–100%). You get a rank (S, A, B or C) when you win. Your best result, your pick and your sound setting are saved in `localStorage`.
+A round lasts 75 seconds. The boss gets less predictable as the meter fills (0–30%, 30–70%, 70–100%).
+
+When you win, your score picks one of three endings. You score love points while you kiss (more at ×2 and ×3), plus 20 for every second left, minus 500 each time you were caught.
+
+- **Under 3,400: Drinks with the boss.** The boss asks her out for drinks, and he goes home alone.
+- **3,400 or more: A rose at 7.** They leave together at 7 pm, and he brings a rose.
+- **4,250 or more: Concert night.** They go to a concert together. You need long, risky streaks for this one.
+
+Your best score and its ending, your pick and your sound setting are saved in `localStorage`. The thresholds are in `CONFIG.endings` in `js/config.js`.
 
 Tuning lives in `LEVELS` in `js/config.js`. There is one level for now. The Friday (easy) and Monday (hard) levels from PR #3 are in git history.
 
