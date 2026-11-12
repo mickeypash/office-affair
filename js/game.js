@@ -22,7 +22,10 @@ class Game {
     this.romance = 0; this.timeLeft = this.level.duration; this.strikes = 0; this.lives = CONFIG.startLives; this.nextLife = 0;
     this.freezeT = 0; this.watchedMs = 0; this.wasKissing = false; this.kissingNow = false;
     this.cdT = 0; this.lastCd = null; this.endT = 0; this.result = null; this.lastSec = 999; this.said50 = false; this.said85 = false;
+    this.lovePoints = 0; this.resetStreak();
   }
+  // streak = seconds of the current unbroken kiss; multiplier = 1, 2 or 3 (fever)
+  resetStreak() { this.streak = 0; this.multiplier = 1; }
   get level() { return LEVELS[this.levelId]; }
   setState(s) { this.state = s; document.body.dataset.state = s; }
   tier() { const t = this.level.tiers; return t.find(x => this.romance < x.until) || t[t.length - 1]; }
@@ -46,7 +49,7 @@ class Game {
     if (this.state !== S.PLAYING && this.state !== S.COUNTDOWN) return;
     this.resumeTo = this.state;
     this.setState(S.PAUSED);
-    player.clear();
+    player.clear(); this.resetStreak();
     $('pauseTo').textContent = cast.girlName();
     ui.showOverlay('pause');
   }
@@ -115,7 +118,16 @@ class Game {
       this.watchedMs = 0;
     }
 
-    if (kissing) this.romance = Math.min(100, this.romance + this.level.romanceRate * dt);
+    // Streak: an unbroken kiss raises the multiplier, which speeds up the meter and scores love points
+    const st = CONFIG.streak, prevMult = this.multiplier;
+    this.streak = kissing ? this.streak + dt : 0;
+    this.multiplier = this.streak >= st.at3 ? 3 : this.streak >= st.at2 ? 2 : 1;
+    if (this.multiplier > prevMult) { renderer.streakUp(this.multiplier); sfx.streakUp(this.multiplier); }
+
+    if (kissing) {
+      this.romance = Math.min(100, this.romance + this.level.romanceRate * st.fill[this.multiplier - 1] * dt);
+      this.lovePoints += st.points * this.multiplier * dt;
+    }
     if (this.nextLife < CONFIG.lifeAt.length && this.romance >= CONFIG.lifeAt[this.nextLife]) { this.nextLife++; this.gainLife(); }
 
     if (!this.said50 && this.romance >= 50) { this.said50 = true; ui.toast('Halfway there. Keep it professional.', 'love', 1); }
@@ -157,6 +169,7 @@ class Game {
   caught() {
     this.strikes++; this.lives = Math.max(0, this.lives - 1);
     this.watchedMs = 0; this.wasKissing = false; this.kissingNow = false;
+    this.resetStreak();
     player.lock();
     this.freezeT = CONFIG.freeze;
     renderer.caught();
@@ -167,6 +180,7 @@ class Game {
 
   end(kind) {
     this.wasKissing = false; this.kissingNow = false;
+    this.resetStreak();
     player.clear();
     const r = { kind, romance: this.romance, timeLeft: this.timeLeft, strikes: this.strikes, level: this.level };
     if (kind === 'win') {

@@ -17,6 +17,7 @@ Open `index.html` in a modern browser (Chrome, Edge, Firefox or Safari). Double-
 | Pause | **Esc** / **P** or the pause button | Pause button |
 
 - **Boss facing away** (typing, sipping coffee, reading, on the phone): kissing is safe.
+- **Hold one kiss longer** for a multiplier: ×2 after 2 seconds, ×3 FEVER after 4. The meter fills faster. Letting go or getting caught resets it.
 - **Yellow ⚠ with a head turn**: the boss is turning around. Kissing is still safe, but let go now.
 - **Boss facing you, red striped sight cone**: kissing for more than 150 ms gets you caught. Kissing while the boss turns back also gets you caught.
 - **Dashed ? while the boss stretches, or lowers his phone and swaps it to his other ear**: this is a bluff. The boss will not turn. He never bluffs twice in a row.
