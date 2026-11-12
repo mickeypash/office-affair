@@ -1,5 +1,5 @@
 'use strict';
-/* "Who's clocking in?" (pick Gabi, Vix or your own girl) and the "Make your own" editor.
+/* "Who's clocking in?" (pick a girl from CHARACTERS or your own girl) and the "Make your own" editor.
    Both draw live in the office behind them. */
 
 /* Small head-and-shoulders portrait for a pick card. */
@@ -12,6 +12,9 @@ const select = {
   el: {},
   init() {
     ['select', 'btnStart', 'btnSelectBack', 'btnRestyle', 'pickCustom', 'pickCustomName'].forEach(id => { this.el[id] = $(id); });
+    // One card per visible girl, in CHARACTERS order, before the "Make your own" card.
+    document.querySelector('#select .pick-slot').insertAdjacentHTML('beforebegin', PLAYABLE.map(c =>
+      `<button class="pick-card" role="radio" data-pick="${esc(c.id)}" aria-checked="false"><span class="pick-face" data-face="${esc(c.id)}">${portraitSVG(GIRLS[c.id])}</span><span class="pick-name">${esc(c.name)}</span></button>`).join(''));
     this.cards = [...document.querySelectorAll('.pick-card')];
     this.cards.forEach(c => c.addEventListener('click', () => this.choose(c.dataset.pick)));
     this.el.btnStart.addEventListener('click', () => game.start());
@@ -32,8 +35,6 @@ const select = {
   },
   render() {
     for (const c of this.cards) c.setAttribute('aria-checked', String(c.dataset.pick === cast.pick));
-    document.querySelector('[data-face="gabi"]').innerHTML = portraitSVG(GIRLS.gabi);
-    document.querySelector('[data-face="vix"]').innerHTML = portraitSVG(GIRLS.vix);
     const face = document.querySelector('[data-face="custom"]');
     if (cast.custom) {
       face.innerHTML = portraitSVG(cast.custom);

@@ -44,7 +44,8 @@ Tuning lives in `MODES` in `js/config.js`. A mode holds everything a difficulty 
 | `index.html` | Page markup: HUD, the SVG office scene, overlays |
 | `css/style.css` | All styles |
 | `js/util.js` | Small helpers and the `localStorage` wrapper |
-| `js/config.js` | Game rules, tuning, the leads, the guy's names and palettes |
+| `js/config.js` | Game rules and tuning |
+| `js/characters.js` | Every character as data: the girls you can play, the "Make your own" defaults and wardrobe, the guy's names and palettes |
 | `js/cast.js` | Your pick, your saved custom girl, and the random guy |
 | `js/art.js` | SVG builders for the characters, hair styles, outfits, the guy, the boss and the walker |
 | `js/audio.js` | Procedural sound effects (Web Audio) |
@@ -76,7 +77,11 @@ Press **Play** and pick who you play:
 
 The guy is a surprise. Every round brings a new random guy, with his name on the desk plate (Banana, Smoothie, Straw, Tree, Pickle or Mango). **Play again** keeps your pick and brings a new guy.
 
-To change the leads, edit `GIRLS` in `js/config.js`. Guy names, skin tones, hair and outfit colours are in the same file. To add a hair style or an outfit, add a builder to `HAIR_ART`, `OUTFIT_ART` or `GUY_OUTFITS` in `js/art.js`, and add its label to `HAIR_STYLES` or `OUTFITS` for the editor.
+Characters live in `js/characters.js`. Each girl in `CHARACTERS` has an `id`, a `name`, a `look` (skin, hair style and colour, outfit and colour, glasses, makeup, mouth, mood) and short `notes`. The picker shows one card per girl, in that order, and then **Make your own**. To add a girl, add an entry. The guy's names, skin tones, hair and outfit colours are in `GUYS` in the same file.
+
+Set `hidden: true` to keep a girl off the picker while she is not ready. A saved pick of a hidden girl falls back to the first visible one. To see hidden girls while you work on them, open the game with `?cast=all` at the end of the URL (for example `index.html?cast=all`). The hidden **New Starter** entry is a placeholder that keeps this working; replace her when a real new girl arrives.
+
+To add a hair style or an outfit, add a builder to `HAIR_ART`, `OUTFIT_ART` or `GUY_OUTFITS` in `js/art.js`, and add its label to `HAIR_STYLES` or `OUTFITS` in `js/characters.js` for the editor.
 
 ## Play online
 

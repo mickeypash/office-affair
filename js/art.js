@@ -234,7 +234,7 @@ const beardProfile = (d, h) => `<path d="M${-34 * d},8 C${-30 * d},52 ${0 * d},7
   <path d="M${50 * d},26 Q${60 * d},20 ${72 * d},26" fill="none" stroke="${h}" stroke-width="7" stroke-linecap="round"/>`;
 const stubbleProfile = (d, h) => `<path d="M${-30 * d},14 C${-24 * d},54 ${0 * d},72 ${30 * d},72 C${52 * d},70 ${62 * d},60 ${64 * d},46 C${52 * d},50 ${40 * d},44 ${34 * d},36 C${16 * d},40 ${-8 * d},32 ${-30 * d},14 Z" fill="${h}" opacity=".28"/>`;
 
-/* A girl's settings (see GIRLS / DEFAULT_CUSTOM in config.js) -> options for coworkerBody. */
+/* A girl's settings (a `look` from characters.js, or the custom girl) -> options for coworkerBody. */
 function girlOpts(m, dir) {
   const hair = HAIR_ART[m.hairStyle] || HAIR_ART.wavy;
   const outfit = OUTFIT_ART[m.outfit] || OUTFIT_ART.turtleneck;
