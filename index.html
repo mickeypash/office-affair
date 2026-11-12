@@ -148,18 +148,42 @@
         <circle r="5" fill="#2B2340"/>
       </g>
 
-      <!-- Poster: black-and-white, quote checked at intothegloss.com/2012/11/isabel-marant-designer -->
-      <g id="poster" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-weight="700" fill="#111" text-anchor="middle">
-        <rect x="1112" y="66" width="242" height="268" fill="#FFFFFF" stroke="#2B2340" stroke-width="5"/>
-        <rect x="1124" y="78" width="218" height="244" fill="none" stroke="#111" stroke-width="1.5"/>
-        <text x="1233" y="134" font-size="11.5" letter-spacing="2.2">I DON'T LIKE IT WHEN</text>
-        <text x="1233" y="150" font-size="11.5" letter-spacing="2.2">THINGS ARE PERFECT.</text>
-        <text x="1233" y="200" font-size="23" letter-spacing="1.2">I LIKE</text>
-        <text x="1233" y="230" font-size="23" letter-spacing="1.2">IMPERFECTION.</text>
-        <line x1="1203" y1="256" x2="1263" y2="256" stroke="#111" stroke-width="2"/>
-        <text x="1233" y="280" font-size="10.5" font-weight="400" letter-spacing="3.5">ISABEL MARANT, 2012</text>
-        <rect x="1100" y="58" width="40" height="16" fill="#EFE8D8" opacity=".95" transform="rotate(-18 1120 66)"/>
-        <rect x="1326" y="58" width="40" height="16" fill="#EFE8D8" opacity=".95" transform="rotate(16 1346 66)"/>
+      <!-- Poster: cartoon homage to an Isabel Marant campaign poster (legs in sheer tights over a white bed) -->
+      <g id="poster" transform="translate(1112,66)">
+        <defs>
+          <clipPath id="posterPhoto"><rect x="18" y="20" width="206" height="214"/></clipPath>
+          <linearGradient id="tights" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#3B2F35"/><stop offset=".5" stop-color="#5A4950"/><stop offset="1" stop-color="#2E2429"/></linearGradient>
+        </defs>
+        <rect width="242" height="268" fill="#FFFFFF" stroke="#2B2340" stroke-width="5"/>
+        <rect x="18" y="20" width="206" height="214" fill="#ECEAE6"/>
+        <g clip-path="url(#posterPhoto)" stroke="#2B2340" stroke-linejoin="round" stroke-linecap="round">
+          <!-- bed -->
+          <path d="M10,188 Q60,176 120,184 Q180,192 232,180 L232,240 L10,240 Z" fill="#FBFAF8" stroke-width="3"/>
+          <path d="M40,200 Q70,196 96,204 M140,206 Q170,200 200,208 M60,220 Q100,214 130,222" fill="none" stroke="#CFCAC2" stroke-width="2"/>
+          <!-- leg along the bed -->
+          <path d="M208,164 C182,160 152,164 128,171 C108,176 84,180 64,186 C52,189 45,190 38,190 L38,200 C50,200 62,199 74,198 C94,196 112,195 132,193 C160,191 186,194 210,198 Z" fill="url(#tights)" stroke-width="3"/>
+          <path d="M192,178 C156,178 116,184 72,192" fill="none" stroke="#8C7880" stroke-width="2" stroke-opacity=".7"/>
+          <path d="M38,189 L20,198 Q16,203 22,203 L42,202 Z" fill="#141016" stroke-width="2.5"/>
+          <path d="M40,202 L43,214" stroke-width="3"/>
+          <!-- raised leg -->
+          <path d="M168,186 C160,162 148,138 140,118 C134,104 128,86 124,70 C121,61 118,55 116,52 L125,47 C129,54 133,61 137,69 C143,82 150,98 154,110 C160,126 172,148 186,164 C194,172 204,176 214,178 Z" fill="url(#tights)" stroke-width="3"/>
+          <path d="M180,166 C160,136 146,100 128,62" fill="none" stroke="#8C7880" stroke-width="2" stroke-opacity=".7"/>
+          <path d="M114,52 L99,34 Q96,29 101,30 L124,45 Z" fill="#141016" stroke-width="2.5"/>
+          <path d="M123,45 L131,30" stroke-width="3"/>
+          <!-- hip -->
+          <ellipse cx="214" cy="181" rx="28" ry="20" fill="#30262B" stroke-width="3"/>
+          <!-- crystal ankle straps -->
+          <g fill="#F2F2F8" stroke-width="1.2">
+            <circle cx="118" cy="51" r="2.6"/><circle cx="122" cy="49" r="2.6"/><circle cx="126" cy="47" r="2.6"/><circle cx="116" cy="47" r="2"/>
+            <circle cx="42" cy="190" r="2.6"/><circle cx="43" cy="195" r="2.6"/><circle cx="43" cy="200" r="2.6"/><circle cx="46" cy="192" r="2"/>
+          </g>
+        </g>
+        <rect x="18" y="20" width="206" height="214" fill="none" stroke="#D8D4CC" stroke-width="1.5"/>
+        <text x="121" y="140" text-anchor="middle" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-weight="700" font-size="21.5" letter-spacing="1.4" fill="#111">ISABEL MARANT</text>
+        <rect x="96" y="147" width="50" height="2" fill="#555"/>
+        <rect x="170" y="246" width="54" height="2" fill="#999"/>
+        <rect x="-12" y="-8" width="40" height="16" fill="#EFE8D8" opacity=".95" transform="rotate(-18 8 0)"/>
+        <rect x="214" y="-8" width="40" height="16" fill="#EFE8D8" opacity=".95" transform="rotate(16 234 0)"/>
       </g>
 
       <!-- Printer -->
