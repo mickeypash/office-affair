@@ -18,6 +18,7 @@ class Renderer {
     ids.forEach(id => { this.el[id] = $(id); });
     const phoneArm = g => ({ paths: [...g.children].filter(n => n.tagName === 'path'), hand: g.querySelector('.phone-hand'), k: 0 });
     this.phoneArms = { R: phoneArm(this.el.actPhone), L: phoneArm(this.el.actPhoneL) };
+    ['streakBadge', 'streakText', 'streakShadow', 'streakFever'].forEach(id => { this.el[id] = $(id); });
     this.heartPool = [];
     for (let i = 0; i < 28; i++) {
       const u = document.createElementNS('http://www.w3.org/2000/svg', 'use');
@@ -80,6 +81,7 @@ class Renderer {
     this.endT = 0; this.mgrPose = ''; this.squash = 0; this.lastActivity = '';
     this.thoughtT = rand(3, 6); this.thoughtShow = 0;
     this.decorT = rand(4, 7); this.walkerX = null; this.jamT = 0; this.plantT = 0; this.emailT = 0; this.emailShown = false;
+    this.streakPop = 0; this.feverGlow = 0; this.shownMult = 1; vis(this.el.streakBadge, false);
     this.heartPool.forEach(h => { h.alive = false; h.node.style.display = 'none'; });
     this.notePool.forEach(n => { n.alive = false; n.node.style.display = 'none'; });
     const e = this.el;
@@ -98,6 +100,10 @@ class Renderer {
     vis(this.el.sheetPop, true);
   }
   actNatural() { this.naturalT = 1.7; }
+  streakUp(n) {
+    this.streakPop = REDUCED ? 0 : 0.32;
+    if (n >= 3) this.heartBurst();
+  }
   win() { this.mode = 'win'; this.endT = 0; }
   lose(kind) { this.mode = kind === 'hr' ? 'loseHR' : 'loseTime'; this.endT = 0; }
 
@@ -141,9 +147,10 @@ class Renderer {
     /* hearts while kissing */
     if ((kissing && L > 0.82) || (this.mode === 'win' && this.endT < 4)) {
       this.heartT -= dt;
-      if (this.heartT <= 0) { this.heartT = this.mode === 'win' ? 0.09 : rand(0.16, 0.24); this.spawnHeart(g.state === S.PLAYING); }
+      if (this.heartT <= 0) { this.heartT = this.mode === 'win' ? 0.09 : g.multiplier >= 3 ? rand(0.08, 0.12) : rand(0.16, 0.24); this.spawnHeart(g.state === S.PLAYING); }
     }
     this.updateHearts(dt);
+    this.updateStreak(dt, g, kissing);
 
     /* act-natural whistle notes */
     if (this.naturalT > 0 && playing) {
@@ -164,8 +171,8 @@ class Renderer {
 
     /* lighting */
     const warmOn = this.mode === 'win' ? clamp(this.endT / 1.2, 0, 1) : 0;
-    e.warm.setAttribute('opacity', (warmOn * 0.9).toFixed(3));
-    e.warm2.setAttribute('opacity', (warmOn * 0.16).toFixed(3));
+    e.warm.setAttribute('opacity', Math.max(warmOn * 0.9, this.feverGlow * 0.45).toFixed(3));
+    e.warm2.setAttribute('opacity', Math.max(warmOn * 0.16, this.feverGlow * 0.07).toFixed(3));
     const dimOn = this.mode === 'loseTime' ? clamp(this.endT / 1.0, 0, 1) * 0.45 : this.mode === 'loseHR' ? clamp(this.endT / 1.0, 0, 1) * 0.2 : 0;
     e.dim.setAttribute('opacity', dimOn.toFixed(3));
 
@@ -278,6 +285,39 @@ class Renderer {
     h.node.setAttribute('fill', pick(['#FF4F86', '#FF6F91', '#FF8FAB', '#E0336C']));
     h.node.style.display = 'inline';
     if (withSound) sfx.pop();
+    return h;
+  }
+  heartBurst() {
+    for (let i = 0; i < 9; i++) {
+      const h = this.spawnHeart(false);
+      if (!h) return;
+      const a = -Math.PI / 2 + (i - 4) * 0.3, sp = rand(190, 270);
+      h.vx = Math.cos(a) * sp; h.vy = Math.sin(a) * sp; h.s = rand(1.1, 1.6);
+    }
+  }
+  /* x2 / x3 badge beside the kiss (clear of the boss), plus the fever glow */
+  updateStreak(dt, g, kissing) {
+    const e = this.el, mult = kissing ? g.multiplier : 1;
+    if (mult !== this.shownMult) {
+      vis(e.streakBadge, mult > 1); vis(e.streakFever, mult >= 3);
+      if (mult > 1) {
+        e.streakText.textContent = e.streakShadow.textContent = '×' + mult;
+        e.streakText.setAttribute('fill', mult >= 3 ? '#FFC23A' : '#FF4F86');
+      }
+      this.shownMult = mult;
+    }
+    const fever = mult >= 3 ? 1 : 0;
+    this.feverGlow += (fever - this.feverGlow) * (1 - Math.exp(-(fever ? 3 : 8) * dt));
+    if (this.feverGlow < 0.002) this.feverGlow = 0;
+    if (mult < 2) return;
+    let sc = 1;
+    if (this.streakPop > 0) {
+      this.streakPop -= dt;
+      const k = 1 - clamp(this.streakPop / 0.32, 0, 1);
+      sc = 0.55 + 0.45 * k + 0.4 * Math.sin(k * Math.PI);
+    }
+    if (mult >= 3 && !REDUCED) sc *= 1 + Math.sin(this.t * 9) * 0.05;
+    e.streakBadge.setAttribute('transform', `translate(1030,318) scale(${sc.toFixed(3)})`);
   }
   updateHearts(dt) {
     for (const h of this.heartPool) {

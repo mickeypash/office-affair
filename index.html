@@ -367,6 +367,16 @@
       <g id="hearts"></g>
       <g id="notes" font-family="ui-rounded, system-ui, sans-serif" font-weight="900" font-size="34" fill="#2B2340"></g>
 
+      <!-- Streak multiplier badge (x2 / x3 FEVER) -->
+      <g id="streakBadge" display="none" transform="translate(1030,318)" font-family="Arial Rounded MT Bold, ui-rounded, system-ui, sans-serif" font-weight="900" text-anchor="middle" stroke-linejoin="round">
+        <text id="streakShadow" x="4" y="5" font-size="64" fill="#2B2340" stroke="#2B2340" stroke-width="12">×2</text>
+        <text id="streakText" font-size="64" fill="#FF4F86" stroke="#2B2340" stroke-width="12" paint-order="stroke">×2</text>
+        <g id="streakFever" display="none">
+          <text x="3" y="40" font-size="28" letter-spacing="2" fill="#2B2340" stroke="#2B2340" stroke-width="9">FEVER</text>
+          <text y="36" font-size="28" letter-spacing="2" fill="#FFF4CF" stroke="#2B2340" stroke-width="9" paint-order="stroke">FEVER</text>
+        </g>
+      </g>
+
       <!-- Manager overlays -->
       <g id="warnIcon" display="none" transform="translate(800,196)">
         <path d="M0 -34 L34 26 L-34 26 Z" fill="#FFC23A" stroke="#2B2340" stroke-width="6" stroke-linejoin="round"/>

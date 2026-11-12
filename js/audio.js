@@ -59,5 +59,7 @@ class Sfx {
   life() { [784, 988, 1319].forEach((f, i) => this.tone(f, 0.16, { type: 'triangle', vol: 0.11, delay: i * 0.08 })); this.tone(1568, 0.4, { vol: 0.07, delay: 0.24 }); }
   ding() { this.tone(1568, 0.25, { vol: 0.05 }); this.tone(2093, 0.3, { vol: 0.04, delay: 0.09 }); }
   click() { this.tone(660, 0.05, { type: 'triangle', vol: 0.08 }); }
+  // streak level-up: a rising two-step blip, higher for fever (x3)
+  streakUp(n) { const f = n >= 3 ? 784 : 587; this.tone(f, 0.09, { type: 'triangle', vol: 0.12, slide: f * 1.5 }); this.tone(f * 1.5, 0.16, { type: 'triangle', vol: 0.1, delay: 0.08, slide: f * 2 }); }
 }
 const sfx = new Sfx();
