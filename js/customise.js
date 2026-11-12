@@ -1,11 +1,55 @@
 'use strict';
-/* Customise screen: edit names and looks. Every change is saved and drawn live in the scene. */
-const customise = {
-  role: 'player',
+/* "Who's clocking in?" (pick Gabi, Vix or your own girl) and the "Make your own" editor.
+   Both draw live in the office behind them. */
+
+/* Small head-and-shoulders portrait for a pick card. */
+function portraitSVG(m) {
+  const body = coworkerBody(girlOpts(m, 1));
+  return `<svg viewBox="-150 -370 300 300" aria-hidden="true"><rect x="-150" y="-370" width="300" height="300" fill="#F6DDA6"/>${body}</svg>`;
+}
+
+const select = {
   el: {},
   init() {
-    ['customise', 'tabPlayer', 'tabPartner', 'custName', 'custTeam', 'custGlasses', 'custDone', 'custShuffle', 'custReset', 'btnCustomise']
-      .forEach(id => { this.el[id] = $(id); });
+    ['select', 'btnStart', 'btnSelectBack', 'btnEditCustom', 'pickCustom', 'pickCustomName'].forEach(id => { this.el[id] = $(id); });
+    this.cards = [...document.querySelectorAll('.pick-card')];
+    this.cards.forEach(c => c.addEventListener('click', () => this.choose(c.dataset.pick)));
+    this.el.btnStart.addEventListener('click', () => game.start());
+    this.el.btnSelectBack.addEventListener('click', () => this.close());
+    this.el.btnEditCustom.addEventListener('click', () => customise.open());
+  },
+  get isOpen() { return this.el.select.classList.contains('show'); },
+  open() { this.render(); ui.showOverlay('select'); },
+  close() { ui.showOverlay('menu'); },
+  choose(p) {
+    if (p === 'custom' && !cast.custom) { cast.ensureCustom(); cast.setPick('custom'); renderer.buildChar('L'); customise.open(); return; }
+    cast.setPick(p);
+    renderer.buildChar('L');
+    renderer.glanceAt('L');
+    this.render();
+  },
+  render() {
+    for (const c of this.cards) c.setAttribute('aria-checked', String(c.dataset.pick === cast.pick));
+    document.querySelector('[data-face="gabi"]').innerHTML = portraitSVG(GIRLS.gabi);
+    document.querySelector('[data-face="vix"]').innerHTML = portraitSVG(GIRLS.vix);
+    const face = document.querySelector('[data-face="custom"]');
+    if (cast.custom) {
+      face.innerHTML = portraitSVG(cast.custom);
+      this.el.pickCustomName.textContent = cast.custom.name;
+      this.el.pickCustom.classList.remove('empty');
+    } else {
+      face.innerHTML = '<span class="pick-plus" aria-hidden="true">+</span>';
+      this.el.pickCustomName.textContent = 'Make your own';
+      this.el.pickCustom.classList.add('empty');
+    }
+    this.el.btnEditCustom.hidden = !cast.custom;
+  },
+};
+
+const customise = {
+  el: {},
+  init() {
+    ['customise', 'custName', 'custGlasses', 'custDone', 'custShuffle', 'custReset'].forEach(id => { this.el[id] = $(id); });
     this.groups = [...document.querySelectorAll('#custBody [data-key]')];
     const palettes = { skin: SKIN_TONES, hair: HAIR_COLOURS, outfitColour: OUTFIT_COLOURS };
     const lists = { hairStyle: HAIR_STYLES, outfit: OUTFITS };
@@ -25,46 +69,26 @@ const customise = {
         if (b) this.apply(key, b.dataset.value);
       });
     }
-    [this.el.tabPlayer, this.el.tabPartner].forEach(t => t.addEventListener('click', () => { this.role = t.dataset.role; this.render(); }));
-    this.el.custName.addEventListener('input', () => this.applyText('name', this.el.custName.value));
-    this.el.custTeam.addEventListener('input', () => this.applyText('team', this.el.custTeam.value));
-    this.el.custGlasses.addEventListener('click', () => this.apply('glasses', !cast.get(this.role).glasses));
-    this.el.custShuffle.addEventListener('click', () => { cast.shuffle(this.role); this.redraw(); this.render(); });
-    this.el.custReset.addEventListener('click', () => { cast.reset(this.role); this.redraw(); this.render(); });
+    this.el.custName.addEventListener('input', () => { cast.setCustom('name', this.el.custName.value); renderer.updatePlate('L'); });
+    this.el.custGlasses.addEventListener('click', () => this.apply('glasses', !cast.custom.glasses));
+    this.el.custShuffle.addEventListener('click', () => { cast.shuffleCustom(); this.redraw(); this.render(); });
+    this.el.custReset.addEventListener('click', () => { cast.resetCustom(); this.redraw(); this.render(); });
     this.el.custDone.addEventListener('click', () => this.close());
-    this.el.btnCustomise.addEventListener('click', () => this.open());
   },
   get isOpen() { return this.el.customise.classList.contains('show'); },
-  get key() { return this.role === 'player' ? 'L' : 'R'; },
   open() {
-    this.role = 'player';
+    cast.ensureCustom();
+    cast.setPick('custom');
+    this.redraw();
     this.render();
     ui.showOverlay('customise');
   },
-  close() { ui.showOverlay('menu'); },
-  redraw() { renderer.buildChar(this.key); renderer.glanceAt(this.key); },
-  apply(key, value) {
-    cast.set(this.role, key, value);
-    this.redraw();
-    this.render();
-  },
-  // Names: save on every keystroke, but do not overwrite what the person is typing.
-  applyText(key, value) {
-    cast.set(this.role, key, value);
-    renderer.updatePlate(this.key);
-    this.renderTabs();
-  },
-  renderTabs() {
-    this.el.tabPlayer.textContent = `${cast.firstName('player')} (you)`;
-    this.el.tabPartner.textContent = cast.firstName('partner');
-    this.el.tabPlayer.setAttribute('aria-selected', String(this.role === 'player'));
-    this.el.tabPartner.setAttribute('aria-selected', String(this.role === 'partner'));
-  },
+  close() { select.open(); },
+  redraw() { renderer.buildChar('L'); renderer.glanceAt('L'); },
+  apply(key, value) { cast.setCustom(key, value); this.redraw(); this.render(); },
   render() {
-    const m = cast.get(this.role);
-    this.renderTabs();
+    const m = cast.custom;
     this.el.custName.value = m.name;
-    this.el.custTeam.value = m.team;
     this.el.custGlasses.setAttribute('aria-pressed', String(m.glasses));
     this.el.custGlasses.textContent = m.glasses ? 'Glasses: on' : 'Glasses: off';
     for (const g of this.groups) {

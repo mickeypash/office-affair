@@ -3,6 +3,7 @@
 const renderer = new Renderer();
 const game = new Game();
 ui.init();
+select.init();
 customise.init();
 confetti.init();
 
@@ -43,11 +44,15 @@ window.addEventListener('keydown', e => {
     return;
   }
   if (e.key === 'Escape' && customise.isOpen) { e.preventDefault(); customise.close(); return; }
+  if (e.key === 'Escape' && select.isOpen) { e.preventDefault(); select.close(); return; }
   if (e.key === 'Escape' || ((e.key === 'p' || e.key === 'P') && !(e.target instanceof HTMLInputElement))) {
     if (gameplayInput()) { e.preventDefault(); game.pause(); }
     else if (game.state === S.PAUSED) { e.preventDefault(); game.resume(); }
   }
-  if (e.key === 'Enter' && game.state === S.MENU && !customise.isOpen && document.activeElement === document.body) { e.preventDefault(); game.start(); }
+  if (e.key === 'Enter' && game.state === S.MENU && document.activeElement === document.body) {
+    if (select.isOpen) { e.preventDefault(); game.start(); }
+    else if (!customise.isOpen) { e.preventDefault(); select.open(); }
+  }
 });
 window.addEventListener('keyup', e => {
   const isSpace = e.code === 'Space' || e.key === ' ';
@@ -86,7 +91,7 @@ document.addEventListener('touchmove', e => { if (gameplayInput()) e.preventDefa
 
 // Buttons
 const toggleSound = () => { sfx.setEnabled(!sfx.enabled); ui.syncSound(); sfx.click(); };
-ui.el.btnPlay.addEventListener('click', () => game.start());
+ui.el.btnPlay.addEventListener('click', () => select.open());
 ui.el.btnSoundMenu.addEventListener('click', toggleSound);
 ui.el.btnSoundHud.addEventListener('click', e => { toggleSound(); e.currentTarget.blur(); });
 ui.el.btnPause.addEventListener('click', e => { game.pause(); });

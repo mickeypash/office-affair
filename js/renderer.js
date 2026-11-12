@@ -34,10 +34,10 @@ class Renderer {
     }
     this.reset();
   }
-  /* (Re)draw one coworker from the cast settings. L = player, R = partner. */
+  /* (Re)draw one character from the cast. L = the girl you play, R = the random guy. */
   buildChar(k) {
-    const role = k === 'L' ? 'player' : 'partner', dir = k === 'L' ? 1 : -1;
-    const o = coworkerOpts(cast.get(role), dir);
+    const dir = k === 'L' ? 1 : -1;
+    const o = k === 'L' ? girlOpts(cast.girl(), dir) : guyOpts(cast.guy, dir);
     $('char' + k).innerHTML = coworkerBody(o);
     $('hands' + k).innerHTML = coworkerHands(o);
     const prev = this.chars[k];
@@ -46,9 +46,8 @@ class Renderer {
     this.updatePlate(k);
   }
   updatePlate(k) {
-    const role = k === 'L' ? 'player' : 'partner';
     const el = $('plate' + k);
-    el.textContent = `${cast.firstName(role)}, ${cast.get(role).team}`;
+    el.textContent = k === 'L' ? cast.girlName() : cast.guyName();
     el.removeAttribute('textLength'); el.removeAttribute('lengthAdjust');
     try {
       if (el.getComputedTextLength() > 132) { el.setAttribute('textLength', '132'); el.setAttribute('lengthAdjust', 'spacingAndGlyphs'); }
@@ -60,7 +59,9 @@ class Renderer {
     const body = $(bodyId), hands = $(handsId);
     const q = s => body.querySelector(s), qh = s => hands.querySelector(s);
     return {
-      x, dir, body, hands, head: q('.cw-head'),
+      x, dir, body, hands, head: q('.cw-head'), male: !!q('.cw[data-male]'),
+      // the curtain of hair on the face side hides in profile, so it doesn't cover the kiss
+      nearCurtain: q(dir > 0 ? '.curtain-r' : '.curtain-l'),
       front: q('.f-front'), profile: q('.f-profile'), earsFront: q('.ears-front'), earProfile: q('.ear-profile'),
       eyesOpen: q('.eyes-open'), pupils: q('.pupils'), eyesBlink: q('.eyes-blink'), eyesHappy: q('.eyes-happy'), eyesWide: q('.eyes-wide'),
       brows: q('.brows'), browsSad: q('.brows-sad'),
@@ -233,7 +234,7 @@ class Renderer {
     }
     // blush
     const blush = clamp(0.18 + g.romance / 100 * 0.45 + (face === 'look' ? 0.3 : 0), 0, 0.85);
-    c.blush.setAttribute('opacity', blush.toFixed(2));
+    if (!c.male) c.blush.setAttribute('opacity', blush.toFixed(2));
     // typing
     if (hands === 'type') {
       const typing = (this.mode === 'play') && this.caughtT <= 0;
@@ -248,6 +249,7 @@ class Renderer {
   setFace(c, f) {
     const profile = f === 'kiss';
     vis(c.front, !profile); vis(c.profile, profile); vis(c.earsFront, !profile); vis(c.earProfile, profile);
+    if (c.nearCurtain) vis(c.nearCurtain, !profile);
     if (profile) return;
     vis(c.eyesOpen, ['idle', 'look', 'natural', 'nervous', 'sad'].includes(f));
     vis(c.eyesBlink, f === 'blink');

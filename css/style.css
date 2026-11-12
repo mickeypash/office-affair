@@ -173,21 +173,6 @@ kbd {
 .howto { margin: 0 0 20px; padding: 0; list-style: none; display: grid; gap: 10px; font-size: 16px; line-height: 1.4; color: rgba(255,255,255,.92); max-width: 42ch; }
 .howto li { display: grid; grid-template-columns: 30px 1fr; align-items: start; gap: 8px; }
 .howto svg { width: 26px; height: 26px; }
-.levels { display: flex; gap: 8px; margin: 0 0 8px; padding: 0; border: 0; }
-.level { position: relative; flex: 1; max-width: 140px; cursor: pointer; }
-.level input { position: absolute; opacity: 0; inset: 0; margin: 0; cursor: pointer; }
-.level span { display: block; text-align: center; }
-.level .lv-day {
-  padding: 8px 6px 2px; border: 3px solid var(--ink); border-bottom: 0; border-radius: 14px 14px 0 0;
-  background: rgba(255,255,255,.14); font-family: var(--font-display); font-size: 17px;
-}
-.level .lv-diff {
-  padding: 0 6px 7px; border: 3px solid var(--ink); border-top: 0; border-radius: 0 0 14px 14px;
-  background: rgba(255,255,255,.14); font-size: 13px; font-weight: 800; color: rgba(255,255,255,.75);
-}
-.level input:checked ~ span { background: var(--paper); color: var(--ink); }
-.level input:focus-visible ~ .lv-day { outline: 4px solid var(--gold); outline-offset: 2px; }
-.level-blurb { margin: 0 0 18px; min-height: 1.4em; font-size: 15px; font-style: italic; color: rgba(255,255,255,.75); }
 .menu-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
 .btn {
   border: 4px solid var(--ink); border-radius: 999px; padding: 12px 26px;
@@ -231,20 +216,35 @@ kbd {
 @keyframes stampIn { from { transform: scale(2.6) rotate(12deg); opacity: 0; } to { transform: scale(1) rotate(12deg); opacity: .85; } }
 .newbest { display: inline-block; margin-left: 8px; padding: 2px 8px; border-radius: 6px; background: var(--gold); font-family: var(--font-body); font-size: 12px; font-weight: 800; vertical-align: middle; }
 
+/* ---------- Who's clocking in? ---------- */
+.pick-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 10px; align-items: start; }
+.pick-card {
+  display: flex; flex-direction: column; align-items: stretch; gap: 6px; padding: 6px 6px 8px;
+  border: 3px solid var(--ink); border-radius: 14px; background: rgba(255,255,255,.12); color: #fff;
+  font-family: var(--font-display); font-size: 17px; transition: transform .08s;
+}
+.pick-card:hover { transform: translateY(-2px); }
+.pick-card[aria-checked="true"] { background: var(--paper); color: var(--ink); box-shadow: 0 0 0 3px var(--gold); }
+.pick-face { display: block; aspect-ratio: 1; border-radius: 9px; overflow: hidden; }
+.pick-face svg { display: block; width: 100%; height: 100%; }
+.pick-card.empty { border-style: dashed; }
+.pick-card.empty .pick-face { display: grid; place-items: center; background: rgba(255,255,255,.08); }
+.pick-plus { font-size: 54px; line-height: 1; color: rgba(255,255,255,.8); }
+.pick-name { text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: clamp(13px, 3.4vw, 17px); }
+.pick-card.empty .pick-name { white-space: normal; line-height: 1.1; }
+.link-btn { border: 0; background: none; padding: 2px 0; color: var(--pink-soft); font-weight: 800; font-size: 14px; text-decoration: underline; }
+.select-actions { display: flex; gap: 10px; align-items: center; margin-top: 14px; }
+
 /* ---------- Customise ---------- */
-#customise { align-items: center; justify-content: flex-start; padding: 16px; pointer-events: none; }
-.cust-panel {
+#customise, #select { align-items: center; justify-content: flex-start; padding: 16px; pointer-events: none; }
+.cust-panel, .select-panel {
   pointer-events: auto; width: min(390px, 100%); max-height: calc(100dvh - 32px); overflow: auto;
   background: rgba(43,35,64,.96); border-radius: 18px; padding: 18px 18px 16px;
   box-shadow: 0 0 0 3px var(--ink), 6px 8px 0 rgba(15,10,30,.45);
   -webkit-user-select: none; user-select: none;
 }
 .cust-title { margin: 0 0 12px; font-family: var(--font-display); font-size: 30px; color: var(--gold); -webkit-text-stroke: 1.5px var(--ink); paint-order: stroke fill; text-shadow: 3px 3px 0 var(--pink); }
-.cust-tabs { display: flex; gap: 6px; margin-bottom: 14px; padding: 4px; border-radius: 999px; background: rgba(255,255,255,.1); }
-.cust-tabs button { flex: 1; border: 0; border-radius: 999px; padding: 8px 10px; background: transparent; font-weight: 800; font-size: 15px; color: rgba(255,255,255,.8); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.cust-tabs button[aria-selected="true"] { background: var(--paper); color: var(--ink); }
 .cust-body { display: grid; gap: 12px; }
-.cust-row.two { display: grid; grid-template-columns: 1.4fr 1fr; gap: 10px; }
 .field { display: grid; gap: 4px; }
 .field span, .cust-label { font-size: 13px; font-weight: 800; color: rgba(255,255,255,.75); }
 .cust-label { display: block; margin-bottom: 6px; }
@@ -274,8 +274,8 @@ kbd {
 .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 
 @media (max-aspect-ratio: 1/1) {
-  #customise { align-items: flex-end; padding: 8px; }
-  .cust-panel { width: 100%; max-height: 46dvh; padding: 14px; }
+  #customise, #select { align-items: flex-end; padding: 8px; }
+  .cust-panel, .select-panel { width: 100%; max-height: 46dvh; padding: 14px; }
   .cust-title { font-size: 22px; margin-bottom: 8px; }
   #menu {
     align-items: safe flex-end; overflow-y: auto; padding: 3vh 6vw 4vh;
@@ -286,8 +286,6 @@ kbd {
   .howto { font-size: 14px; gap: 7px; margin-bottom: 16px; }
   .howto li { grid-template-columns: 24px 1fr; }
   .howto svg { width: 22px; height: 22px; }
-  .level .lv-day { font-size: 15px; }
-  .level-blurb { margin-bottom: 14px; font-size: 14px; }
   .btn { font-size: 18px; }
   .btn.primary { font-size: 22px; padding: 11px 30px; }
   .btn.small { font-size: 15px; padding: 8px 14px; }
