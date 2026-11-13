@@ -13,7 +13,7 @@ const STORIES = {
   nvidia: {
     id: 'nvidia', girls: ['alice', 'kimberly'], guy: { mode: 'named', id: 'jensen' }, poster: 'nvidia',
     // A GPU rack for the printer, GPUs for the coffee tower, model training on Jensen's screen. Palette: nvidiaLight or nvidiaDark.
-    scene: { parts: { printer: 'gpuRack', walkerLoad: 'gpus', screenR: 'aiTraining' }, palette: 'nvidiaLight' },
+    scene: { parts: { printer: 'gpuRack', walkerLoad: 'gpus', screenR: 'aiTraining' }, palette: 'nvidiaDark' },
     // The watcher is a board member, not the boss.
     copy: {
       menu: { tagline: 'Love runs in parallel.', howtoBoss: 'Let go before the board member turns around.' },
