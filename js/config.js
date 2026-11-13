@@ -42,10 +42,9 @@ const MODES = {
   },
 };
 const DEFAULT_MODE = 'standard';
-// Standard is the old Wednesday level. Best scores are still saved under best.wednesday.
+// Standard is the old Wednesday level; LEVELS.wednesday is kept as an alias for older code and tests.
 // Friday (easy) and Monday (hard) levels are in git history (PR #3).
 const LEVELS = { wednesday: MODES.standard };
-const DEFAULT_LEVEL = 'wednesday';
 
 const S = { MENU: 'MENU', COUNTDOWN: 'COUNTDOWN', PLAYING: 'PLAYING', PAUSED: 'PAUSED', WON: 'WON', LOST: 'LOST' };
 const M = { DISTRACTED: 'DISTRACTED', SUSPICIOUS: 'SUSPICIOUS', WATCHING: 'WATCHING', RETURNING: 'RETURNING' };

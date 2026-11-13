@@ -61,7 +61,7 @@ const sep = url.includes('?') ? '&' : '?';
 
   // Saves are per story
   const keys = await page.evaluate(() => ({ pick: localStorage.getItem('officeAffair.pick.nvidia'), best: localStorage.getItem('officeAffair.best.nvidia'),
-    officePick: localStorage.getItem('officeAffair.pick'), officeBest: localStorage.getItem('officeAffair.best.wednesday') }));
+    officePick: localStorage.getItem('officeAffair.pick.office'), officeBest: localStorage.getItem('officeAffair.best.office') }));
   ok(keys.pick === '"kimberly"' && !!keys.best, 'pick and best saved under pick.nvidia and best.nvidia');
   ok(keys.officePick === null && keys.officeBest === null, 'office save keys are untouched');
   await go('story=nvidia');
