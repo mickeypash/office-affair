@@ -1,0 +1,54 @@
+# Runs the end-to-end suites (tests/e2e) on every pull request and on pushes to main.
+# One job per suite, in parallel. Screenshots are uploaded when a suite fails.
+name: Tests
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# A new push to the same branch cancels the older run.
+concurrency:
+  group: tests-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  e2e:
+    name: ${{ matrix.suite }}
+    runs-on: ubuntu-24.04   # Playwright 1.58 cannot install Chromium on ubuntu-latest (26.04)
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        suite: [test, cast, chars, story, lives, bluffs, streak, endings]
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - name: Cache Playwright browsers
+        uses: actions/cache@v6
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+
+      - run: npx playwright install --with-deps chromium
+
+      - name: Run ${{ matrix.suite }}
+        run: node tests/run.js ${{ matrix.suite }}
+
+      - if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: shots-${{ matrix.suite }}
+          path: tests/e2e/shots/
+          if-no-files-found: ignore
