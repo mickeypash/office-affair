@@ -45,7 +45,7 @@ Tuning lives in `MODES` in `js/config.js`. A mode holds everything a difficulty 
 | `css/style.css` | All styles |
 | `js/util.js` | Small helpers and the `localStorage` wrapper |
 | `js/config.js` | Game rules and tuning |
-| `js/stories.js` | Stories: which cast and poster a game uses (`?story=<id>`, e.g. `?story=nvidia`) |
+| `js/stories.js` | Stories: which cast, poster and words a game uses. `DEFAULT_STORY` (today `nvidia`) is the game you get; `?story=office` is Gabi and Vix |
 | `js/posters.js` | Poster artwork for stories |
 | `js/copy.js` | All the game's words (menu, toasts, the boss's thoughts, endings, memos). Edit text here; a story can override any line |
 | `js/characters.js` | Every character as data: the girls you can play, the "Make your own" defaults and wardrobe, the guy's names and palettes |
