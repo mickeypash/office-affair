@@ -24,7 +24,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        suite: [test, cast, chars, story, copy, analytics, lives, bluffs, streak, endings]
+        suite: [test, cast, chars, story, copy, analytics, meta, lives, bluffs, streak, endings]
     steps:
       - uses: actions/checkout@v7
 
