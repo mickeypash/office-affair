@@ -37,6 +37,7 @@ class Game {
     if (document.activeElement && document.activeElement.blur) document.activeElement.blur();
     this.cdT = 3; this.lastCd = null;
     this.setState(S.COUNTDOWN);
+    analytics.roundStarted();
   }
   pause() {
     if (this.state !== S.PLAYING && this.state !== S.COUNTDOWN) return;
@@ -187,5 +188,6 @@ class Game {
       this.endT = 1.5;
     }
     this.result = r;
+    analytics.roundEnded(r);
   }
 }

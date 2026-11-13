@@ -90,6 +90,18 @@ To add a hair style or an outfit, add a builder to `HAIR_ART`, `OUTFIT_ART` or `
 
 **https://mickey.sh/office-affair/**
 
+## Privacy
+
+The live site sends a few anonymous events to PostHog (`js/analytics.js`), so we can see how the game is played:
+a page view, `round_start` (story, built-in character id or "custom", round number), `round_end` (win/HR/time, ending,
+score in steps of 500, seconds played, time left, times caught) and `wardrobe_open`, plus device type (touch or mouse),
+a rounded viewport size and the referring domain.
+
+- No cookies and no localStorage for analytics: the visit id lives in memory, so every page load is a new anonymous visitor.
+- No person profiles, no names (not even the "Make your own" name), no session recording, no autocapture.
+- Off when the browser sends Do Not Track or Global Privacy Control, and off everywhere except https://mickey.sh (local files, local servers and CI send nothing).
+- IP addresses are discarded by the PostHog project settings.
+
 ## Tests
 
 End-to-end suites live in `tests/e2e` (Playwright, headless Chromium). GitHub Actions runs them on every pull request and on pushes to `main` (`.github/workflows/test.yml`), one job per suite.

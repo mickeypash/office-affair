@@ -80,6 +80,7 @@ const customise = {
   },
   get isOpen() { return this.el.customise.classList.contains('show'); },
   open() {
+    analytics.track('wardrobe_open');
     cast.ensureCustom();
     cast.setPick('custom');
     this.redraw();
