@@ -31,6 +31,9 @@ jobs:
           mkdir -p _site
           cp -r index.html css js _site/
           touch _site/.nojekyll
+          # Cache busting: Pages lets browsers keep files for 10 minutes, so give every CSS/JS URL this commit's id.
+          sed -i -E "s#(src=\"js/[^\"?]+\.js|href=\"css/[^\"?]+\.css)\"#\1?v=${GITHUB_SHA::7}\"#g" _site/index.html
+          grep -q "js/main.js?v=${GITHUB_SHA::7}" _site/index.html
 
       - uses: actions/configure-pages@v6
 

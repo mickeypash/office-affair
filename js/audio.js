@@ -4,6 +4,8 @@ class Sfx {
   constructor() { this.ctx = null; this.master = null; this.enabled = store.get('sound', true) !== false; this.noiseBuf = null; }
   unlock() {
     try {
+      // iPhone: play as media, so the ring/silent switch does not mute the game (Safari 17+).
+      if (navigator.audioSession && navigator.audioSession.type !== 'playback') navigator.audioSession.type = 'playback';
       if (!this.ctx) {
         const AC = window.AudioContext || window.webkitAudioContext;
         if (!AC) return;
@@ -16,7 +18,8 @@ class Sfx {
         const data = this.noiseBuf.getChannelData(0);
         for (let i = 0; i < len; i++) data[i] = Math.random() * 2 - 1;
       }
-      if (this.ctx.state === 'suspended') this.ctx.resume();
+      // 'suspended' before the first tap; iOS can also leave it 'interrupted' after a call or an app switch.
+      if (this.ctx.state !== 'running') this.ctx.resume();
     } catch (e) { /* audio is optional */ }
   }
   setEnabled(on) { this.enabled = on; store.set('sound', on); if (on) this.unlock(); }
