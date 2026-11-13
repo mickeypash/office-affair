@@ -138,7 +138,7 @@ const HAIR_ART = {
     back: () => '',
     front: h => `<path d="M-68,-18 C-64,-70 -30,-76 0,-76 C30,-76 64,-70 68,-18 C42,-48 -42,-48 -68,-18 Z" fill="${h}" opacity=".6"/>`,
   },
-  // Shoulder-length waves with a side part (Alice). Needs a hex colour: the shading is made from it.
+  // Shoulder-length waves with a side part (Kimberly). Needs a hex colour: the shading is made from it.
   shoulderWaves: {
     back: h => `<g fill="${tint(h, -0.06)}" ${SW(5)}>
       <path d="M-84,10 C-94,-70 -46,-102 0,-102 C46,-102 94,-70 84,10 Z"/>
@@ -152,7 +152,7 @@ const HAIR_ART = {
       <g class="curtain-r"><path d="M74,-47 C80.75,-24.4 78.5,4.5 74,30 C64,8 60,-22 42,-38 Z" fill="${h}" ${SW(5)}/>
         <path d="M62,-14 Q66,4 66,18" fill="none" stroke="${tint(h, 0.3)}" stroke-width="5" stroke-linecap="round"/></g>`,
   },
-  // Long, straight and glossy, swept to one side (Kimberly). "behind" is drawn in body space, behind the body.
+  // Long, straight and glossy, swept to one side (Alice). "behind" is drawn in body space, behind the body.
   longStraight: {
     behind: h => `<path d="M-84,-306 C-60,-350 60,-350 84,-306 L94,-120 L-94,-120 Z" fill="${tint(h, -0.19)}" ${SW(6)}/>`,
     back: h => `<g fill="${tint(h, -0.19)}" ${SW(5)}>
@@ -215,7 +215,7 @@ const OUTFIT_ART = {
       <circle cx="14" cy="-112" r="5" fill="${INK}"/><circle cx="14" cy="-66" r="5" fill="${INK}"/><circle cx="14" cy="-20" r="5" fill="${INK}"/>
       <path d="M-80,-60 h40 v26 h-40 Z" fill="${shade(c, -0.12)}" ${SW(4)}/>`,
   },
-  buttonTop: { // scoop neck, button placket, small print (Alice)
+  buttonTop: { // scoop neck, button placket, small print (Kimberly)
     sleeve: c => c,
     svg: (c, m) => `<path d="M-50,-190 Q0,-104 50,-190 Z" fill="${m.skin}" ${SW(5)}/>
       <path d="M0,-146 L0,80" stroke="${tint(c, -0.18)}" stroke-width="5" stroke-linecap="round"/>
@@ -223,7 +223,7 @@ const OUTFIT_ART = {
       <circle cx="0" cy="-26" r="5.5" fill="#E9ECF7" ${SW(3)}/><circle cx="0" cy="20" r="5.5" fill="#E9ECF7" ${SW(3)}/>
       <path d="M-70,-120 q8,6 0,12 M-60,-40 q8,6 0,12 M66,-100 q-8,6 0,12 M58,-20 q-8,6 0,12" fill="none" stroke="${tint(c, -0.18)}" stroke-width="4" stroke-linecap="round"/>`,
   },
-  coat: { // long coat with wide lapels over a black top (Kimberly)
+  coat: { // long coat with wide lapels over a black top (Alice)
     sleeve: c => c,
     svg: c => `<path d="M-28,-190 L0,-112 L28,-190 Z" fill="#221D2B" ${SW(5)}/>
       <path d="M-50,-190 L-28,-190 L4,-104 L-14,-40 L-40,-110 L-66,-130 Z" fill="${tint(c, 0.7)}" ${SW(5)}/>
@@ -283,7 +283,7 @@ const MAKEUP = `<g fill="none" stroke="${INK}" stroke-linecap="round">
 const makeupProfile = d => `<path d="M${40 * d},-3 L${50 * d},-10" stroke="${INK}" stroke-width="4" stroke-linecap="round"/>`;
 const POUT = `<path d="M-9,34 Q-12,26 -4,27 Q0,24 4,27 Q12,26 9,34 Q6,44 0,44 Q-6,44 -9,34 Z" fill="#D9667F" ${SW(3.5)}/>
   <path d="M-6,34 Q0,36 6,34" fill="none" stroke="${INK}" stroke-width="2.5"/>`;
-// Sparkly drop earrings (Kimberly): on the left ear in front view (the hair covers the right one), on the ear in profile.
+// Sparkly drop earrings (Alice): on the left ear in front view (the hair covers the right one), on the ear in profile.
 const EARRING = (x, y) => `<g transform="translate(${x},${y})">
     <circle r="4.5" fill="#F5F3FF" ${SW(2.5)}/>
     <path d="M0,4 L0,12" stroke="#B9B6CC" stroke-width="2.5"/>
