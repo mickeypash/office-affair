@@ -30,6 +30,7 @@ const sep = url.includes('?') ? '&' : '?';
   // ?story=office: Gabi and Vix, a random guy, the office poster
   await go('story=office');
   ok(await page.evaluate(() => STORY.id) === 'office', '?story=office selects the office');
+  ok(await page.textContent('[data-copy="menu.howtoBoss"]') === 'Let go before the boss turns around.', 'office keeps the boss');
   ok((await page.textContent('#poster')).includes('ISABEL MARANT'), 'office poster');
   await page.click('#btnPlay');
   ok(await cards(page) === 'gabi,vix,custom', 'office picker: Gabi, Vix, Make your own');
@@ -39,6 +40,18 @@ const sep = url.includes('?') ? '&' : '?';
   ok(await page.evaluate(() => STORY.id) === 'nvidia', '?story=nvidia selects the story');
   ok((await page.textContent('#poster')).includes('NVIDIA') && !(await page.textContent('#poster')).includes('ISABEL'), 'NVIDIA poster replaces the office poster');
   ok(await page.$eval('#poster', g => g.getBBox().width > 230 && g.getBBox().width < 300), 'poster keeps its size on the wall');
+  // Words: a board member watches, not the boss; lines the story does not name keep the defaults
+  const w = await page.evaluate(() => ({
+    tagline: document.querySelector('.subtitle').textContent, howto: document.querySelector('[data-copy="menu.howtoBoss"]').textContent,
+    pause: document.querySelector('#pause .sub').textContent, distracted: COPY.toasts.distracted, drinks: ENDINGS.drinks.name,
+    drinksRe: COPY.endings.drinks.re === COPY_DEFAULT.endings.drinks.re, rose: COPY.endings.rose === COPY_DEFAULT.endings.rose,
+    timeUp: COPY.toasts.timeUp === COPY_DEFAULT.toasts.timeUp, title: [...document.querySelectorAll('#gameTitle span')].map(e => e.textContent).join(' '),
+    boss: JSON.stringify([COPY.menu, COPY.pause, COPY.toasts.distracted, COPY.toasts.almost, COPY.endings.drinks]).toLowerCase().includes('the boss'),
+  }));
+  ok(w.tagline === 'Love runs in parallel.' && w.howto === 'Let go before the board member turns around.', 'menu: NVIDIA tagline, board member how-to');
+  ok(w.pause === "The board member can't see you. Probably." && w.distracted === 'The board member is distracted...', 'pause memo and toasts name the board member');
+  ok(w.drinks === 'Drinks with the board member' && w.drinksRe && w.rose && w.timeUp, 'drinks ending is the board member; other lines keep the defaults');
+  ok(w.title === 'OFFICE AFFAIR' && !w.boss, 'title unchanged; no "the boss" left in the story lines');
   await page.click('#btnPlay');
   ok(await cards(page) === 'alice,kimberly,custom', 'picker: Alice, Kimberly, Make your own');
   ok(await page.$$eval('.pick-card:not(#pickCustom)', els => els.every(e => !!e.querySelector('.pick-face svg'))), 'their cards have portraits');
