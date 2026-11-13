@@ -94,12 +94,14 @@ To add a hair style or an outfit, add a builder to `HAIR_ART`, `OUTFIT_ART` or `
 
 The live site sends a few anonymous events to PostHog (`js/analytics.js`), so we can see how the game is played:
 a page view, `round_start` (story, built-in character id or "custom", round number), `round_end` (win/HR/time, ending,
-score in steps of 500, seconds played, time left, times caught) and `wardrobe_open`, plus device type (touch or mouse),
-a rounded viewport size and the referring domain.
+score in steps of 500, seconds played, time left, times caught) and `wardrobe_open`, plus browser, OS and device type
+(from the user agent, which is also sent so PostHog can spot bots), touch or mouse, a rounded viewport size and the referring domain.
 
 - No cookies and no localStorage for analytics: the visit id lives in memory, so every page load is a new anonymous visitor.
 - No person profiles, no names (not even the "Make your own" name), no session recording, no autocapture.
 - Off when the browser sends Do Not Track or Global Privacy Control, and off everywhere except https://mickey.sh (local files, local servers and CI send nothing).
+- Off for automated browsers (`navigator.webdriver`: Playwright, Puppeteer, Selenium and many bots).
+- To leave your own visits out, run `localStorage.setItem('officeAffair.analytics', 'off')` once in the browser's developer console.
 - IP addresses are discarded by the PostHog project settings.
 
 ## Tests

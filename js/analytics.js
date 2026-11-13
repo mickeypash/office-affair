@@ -1,7 +1,10 @@
 'use strict';
 /* Privacy-first analytics: a few anonymous events sent straight to PostHog's capture API (no PostHog script).
-   - Sends only on the live site (https://mickey.sh). Off for file://, local servers and CI, and off when the
-     browser sends Do Not Track or Global Privacy Control.
+   - Sends only on the live site (https://mickey.sh). Off for file://, local servers and CI, off for automated
+     browsers (navigator.webdriver: Playwright, Puppeteer, Selenium, many bots), and off when the browser sends
+     Do Not Track or Global Privacy Control.
+   - To leave your own visits out, run this once in the browser's developer console:
+       localStorage.setItem('officeAffair.analytics', 'off')     (remove the key to turn it back on)
    - Stores nothing: no cookies, no localStorage. The visit id lives in memory, so every page load is a new
      anonymous visitor, and events never create person profiles.
    - Never sends names (not even the "Make your own" name), only story ids, built-in character ids and numbers.
@@ -13,6 +16,16 @@ const ANALYTICS = {
   liveHosts: ['mickey.sh'],
 };
 
+/* Browser, OS and device type from the user agent, as PostHog names them ($browser, $os, $device_type). */
+function uaProps(ua) {
+  const browser = /Edg\//.test(ua) ? 'Microsoft Edge' : /SamsungBrowser/.test(ua) ? 'Samsung Internet' : /OPR\/|Opera/.test(ua) ? 'Opera'
+    : /Firefox\/|FxiOS/.test(ua) ? 'Firefox' : /CriOS|Chrome\//.test(ua) ? 'Chrome' : /Safari\//.test(ua) ? 'Safari' : 'Other';
+  const os = /iPhone|iPad|iPod/.test(ua) ? 'iOS' : /Android/.test(ua) ? 'Android' : /Mac OS X|Macintosh/.test(ua) ? 'Mac OS X'
+    : /Windows/.test(ua) ? 'Windows' : /CrOS/.test(ua) ? 'Chrome OS' : /Linux/.test(ua) ? 'Linux' : 'Other';
+  const device = /iPad|Tablet/.test(ua) || (/Android/.test(ua) && !/Mobile/.test(ua)) ? 'Tablet' : /Mobi|iPhone|iPod|Android/.test(ua) ? 'Mobile' : 'Desktop';
+  return { $browser: browser, $os: os, $device_type: device, $raw_user_agent: ua };
+}
+
 /* A random id (UUID v4), and a time-ordered one (UUID v7) for PostHog's session id. */
 const rndHex = n => Array.from(crypto.getRandomValues(new Uint8Array(Math.ceil(n / 2))), b => b.toString(16).padStart(2, '0')).join('').slice(0, n);
 const uuid4 = () => (crypto.randomUUID ? crypto.randomUUID() : `${rndHex(8)}-${rndHex(4)}-4${rndHex(3)}-a${rndHex(3)}-${rndHex(12)}`);
@@ -23,12 +36,14 @@ const analytics = {
   debug: new URLSearchParams(location.search).get('analytics') === 'debug',
   visitor: uuid4(), session: uuid7(),
   rounds: 0, roundStart: 0,
-  /* Should this page send events? */
-  enabledFor(loc, nav, win) {
+  /* Should this page send events? optedOut = this browser turned analytics off in the console. */
+  enabledFor(loc, nav, win, optedOut = false) {
     const dnt = nav.doNotTrack === '1' || nav.doNotTrack === 'yes' || win.doNotTrack === '1' || nav.msDoNotTrack === '1';
-    return loc.protocol === 'https:' && ANALYTICS.liveHosts.includes(loc.hostname) && !dnt && nav.globalPrivacyControl !== true;
+    return loc.protocol === 'https:' && ANALYTICS.liveHosts.includes(loc.hostname) && !dnt && nav.globalPrivacyControl !== true
+      && nav.webdriver !== true && !optedOut;
   },
-  get enabled() { return this.enabledFor(location, navigator, window); },
+  get optedOut() { try { return localStorage.getItem('officeAffair.analytics') === 'off'; } catch (e) { return false; } },
+  get enabled() { return this.enabledFor(location, navigator, window, this.optedOut); },
   track(event, props = {}) {
     if (!this.enabled && !this.debug) return;
     const ref = (() => { try { return document.referrer ? new URL(document.referrer).hostname : ''; } catch (e) { return ''; } })();
@@ -38,7 +53,7 @@ const analytics = {
         app: 'office-affair', story: STORY.id, ...props,
         $process_person_profile: false, $session_id: this.session, $lib: 'office-affair',
         $current_url: location.origin + location.pathname, $host: location.hostname, $pathname: location.pathname,
-        $referring_domain: ref || '$direct',
+        $referring_domain: ref || '$direct', ...uaProps(navigator.userAgent),
         device: matchMedia('(pointer: coarse)').matches ? 'touch' : 'mouse',
         viewport: `${Math.round(innerWidth / 100) * 100}x${Math.round(innerHeight / 100) * 100}`,
       },

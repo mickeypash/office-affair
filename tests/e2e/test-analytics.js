@@ -8,7 +8,9 @@ const ok = (c, m) => { console.log((c ? 'PASS ' : 'FAIL ') + m); if (!c) process
 const types = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.png': 'image/png', '.svg': 'image/svg+xml' };
 
 // Serve the repo as if it were the live site, and catch everything sent to PostHog (nothing leaves the machine).
-async function liveContext(b, init) {
+// Playwright sets navigator.webdriver, which turns analytics off; human: true pretends to be a normal browser.
+const asHuman = () => Object.defineProperty(Navigator.prototype, 'webdriver', { get: () => false });
+async function liveContext(b, init, human = true) {
   const ctx = await b.newContext({ viewport: { width: 1440, height: 900 } });
   const sent = [];
   await ctx.route('**/*', route => {
@@ -25,6 +27,7 @@ async function liveContext(b, init) {
     }
     return route.abort();
   });
+  if (human) await ctx.addInitScript(asHuman);
   if (init) await ctx.addInitScript(init);
   return { ctx, sent };
 }
@@ -51,10 +54,13 @@ const winRound = async page => {
       const at = (protocol, hostname) => analytics.enabledFor({ protocol, hostname }, nav, win);
       return { live: at('https:', 'mickey.sh'), http: at('http:', 'mickey.sh'), local: at('http:', 'localhost'), other: at('https:', 'example.com'),
         dnt: analytics.enabledFor({ protocol: 'https:', hostname: 'mickey.sh' }, { doNotTrack: '1' }, {}),
-        gpc: analytics.enabledFor({ protocol: 'https:', hostname: 'mickey.sh' }, { globalPrivacyControl: true }, {}) };
+        gpc: analytics.enabledFor({ protocol: 'https:', hostname: 'mickey.sh' }, { globalPrivacyControl: true }, {}),
+        bot: analytics.enabledFor({ protocol: 'https:', hostname: 'mickey.sh' }, { webdriver: true }, {}),
+        optOut: analytics.enabledFor({ protocol: 'https:', hostname: 'mickey.sh' }, {}, {}, true) };
     });
     ok(rules.live && !rules.http && !rules.local && !rules.other, 'only https://mickey.sh is live');
     ok(!rules.dnt && !rules.gpc, 'Do Not Track and Global Privacy Control turn it off');
+    ok(!rules.bot && !rules.optOut, 'automated browsers and the console opt-out turn it off');
     await page.close();
   }
 
@@ -94,6 +100,8 @@ const winRound = async page => {
     const pv = sent[0];
     ok(/^phc_\w{20,}$/.test(pv.api_key) && pv.properties.$current_url === LIVE && pv.properties.$host === 'mickey.sh' && pv.properties.$process_person_profile === false
       && pv.properties.$session_id && pv.timestamp, 'pageview payload: project key, url, host, session id, anonymous');
+    ok(pv.properties.$browser === 'Chrome' && ['Mac OS X', 'Linux', 'Windows'].includes(pv.properties.$os) && pv.properties.$device_type === 'Desktop'
+      && typeof pv.properties.$raw_user_agent === 'string' && pv.properties.$raw_user_agent.length > 20, `browser, OS and device type (${pv.properties.$browser} / ${pv.properties.$os} / ${pv.properties.$device_type})`);
     ok(sent.every(e => e.distinct_id === pv.distinct_id && e.properties.$session_id === pv.properties.$session_id), 'one visit id and one session id per page load');
     const stored = await page.evaluate(() => ({ cookie: document.cookie, ls: Object.keys(localStorage).filter(k => !k.startsWith('officeAffair.')) }));
     const cookies = await ctx.cookies();
@@ -104,10 +112,12 @@ const winRound = async page => {
     await ctx.close();
   }
 
-  // 4. Global Privacy Control / Do Not Track on the live site: nothing sent
-  for (const [label, init] of [['Global Privacy Control', () => Object.defineProperty(Navigator.prototype, 'globalPrivacyControl', { get: () => true })],
-                               ['Do Not Track', () => Object.defineProperty(Navigator.prototype, 'doNotTrack', { get: () => '1' })]]) {
-    const { ctx, sent } = await liveContext(b, init);
+  // 4. On the live site, nothing is sent for: GPC, DNT, an automated browser, or a browser opted out in the console
+  for (const [label, init, human] of [['Global Privacy Control', () => Object.defineProperty(Navigator.prototype, 'globalPrivacyControl', { get: () => true }), true],
+                                      ['Do Not Track', () => Object.defineProperty(Navigator.prototype, 'doNotTrack', { get: () => '1' }), true],
+                                      ['An automated browser (navigator.webdriver)', null, false],
+                                      ['Console opt-out', () => { try { localStorage.setItem('officeAffair.analytics', 'off'); } catch (e) {} }, true]]) {
+    const { ctx, sent } = await liveContext(b, init, human);
     const page = await ctx.newPage(); page.on('pageerror', e => errs.push(e.message));
     await page.goto(LIVE); await page.waitForTimeout(400);
     await winRound(page);
