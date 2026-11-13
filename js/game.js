@@ -5,7 +5,7 @@ const CAUGHT_LINES = ['HR would like a word.', "That spreadsheet won't save you.
 class Game {
   constructor() {
     this.state = S.MENU; this.resumeTo = null;
-    this.levelId = DEFAULT_LEVEL;   // best scores are saved per level id
+    this.levelId = STORY.id === 'office' ? DEFAULT_LEVEL : STORY.id;   // best scores are saved per level id (and per story)
     this.modeId = DEFAULT_MODE;
     this.buildRules();
     // Older versions kept one best score. Treat it as the Wednesday (normal) best.

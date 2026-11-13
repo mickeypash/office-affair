@@ -22,19 +22,20 @@ const cast = {
   custom: null,      // the "Make your own" girl, or null until she is made
   guy: null,
   load() {
-    const p = store.get('pick', PICKS[0]);
+    const p = store.get(storyKey('pick'), PICKS[0]);
     const saved = store.get('customGirl', null);
     this.custom = saved ? cleanGirl(saved) : null;
     this.pick = PICKS.includes(p) && (p !== 'custom' || this.custom) ? p : PICKS[0];
     this.rollGuy();
   },
-  setPick(p) { if (PICKS.includes(p) && (p !== 'custom' || this.custom)) { this.pick = p; store.set('pick', p); } },
+  setPick(p) { if (PICKS.includes(p) && (p !== 'custom' || this.custom)) { this.pick = p; store.set(storyKey('pick'), p); } },
   girl() { return this.pick === 'custom' ? this.custom : GIRLS[this.pick]; },
   girlName() { return this.girl().name; },
   guyName() { return this.guy.name; },
-  // Usually a random guy; sometimes a visible named guy (GUY_CHARACTERS).
+  // The story's named guy every round, or usually a random guy and sometimes a visible named guy (GUY_CHARACTERS).
   rollGuy() {
-    const named = NAMED_GUYS.length && Math.random() < GUYS.namedChance ? pick(NAMED_GUYS) : null;
+    const named = STORY.guy.mode === 'named' ? GUY_CHARACTERS.find(c => c.id === STORY.guy.id)
+      : NAMED_GUYS.length && Math.random() < GUYS.namedChance ? pick(NAMED_GUYS) : null;
     this.guy = named ? { id: named.id, name: named.name, ...named.look } : randomGuy();
     return this.guy;
   },
