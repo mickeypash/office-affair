@@ -22,12 +22,12 @@ const CHARACTERS = [
     notes: 'Lead, drawn from the reference photo. Black blazer, resting mean face and a smirk. Never tongue out.',
   },
   {
-    id: 'alice', name: 'Alice', hidden: true,
+    id: 'kimberly', name: 'Kimberly', hidden: true,
     look: { skin: '#F3C8A5', hairStyle: 'shoulderWaves', hair: '#A9733F', outfit: 'buttonTop', outfitColour: '#3F5D9E', glasses: false, makeup: false, mouth: null },
     notes: 'From the old single-file game (Marketing). Shoulder-length light-brown waves, blue button-front top.',
   },
   {
-    id: 'kimberly', name: 'Kimberly', hidden: true,
+    id: 'alice', name: 'Alice', hidden: true,
     look: { skin: '#F5D3BA', hairStyle: 'longStraight', hair: '#2A2434', outfit: 'coat', outfitColour: '#F5F1E8', glasses: false, makeup: false, mouth: null, earrings: true },
     notes: 'From the old single-file game (HR). Long straight black hair, white coat over a black top, drop earrings.',
   },
