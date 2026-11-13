@@ -102,7 +102,7 @@ const ok = (c, m) => { console.log((c ? 'PASS ' : 'FAIL ') + m); if (!c) process
   await page.waitForTimeout(1500);
   await page.screenshot({ path: out('shot-win.png') });
   ok(await page.evaluate(() => document.getElementById('resultEnding').textContent.includes('Drinks with the boss') && window.__officeAffair.game.result.ending === 'drinks'), 'drinks ending for a short kiss, 30s left (endings replace ranks)');
-  ok(await page.evaluate(() => !!localStorage.getItem('officeAffair.best.wednesday')), 'best score stored');
+  ok(await page.evaluate(() => !!localStorage.getItem('officeAffair.best.office')), 'best score stored');
   // repeated restarts
   for (let i = 0; i < 5; i++) { await page.evaluate(() => window.__officeAffair.game.start()); await page.waitForTimeout(80); }
   await page.waitForTimeout(3300);

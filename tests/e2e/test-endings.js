@@ -70,7 +70,7 @@ const EXPECT = {
   ok(w.m.icon && w.m.ending.startsWith('Ending 1 of 3Drinks with the boss') && w.m.newBest, 'drinks: icon, ending line, New best (first win)');
   ok(w.m.rows.map(r => r[0]).join() === 'Time remaining,Times caught,Score,Best result', 'stats table rows kept');
   ok(w.m.rows[2][1] === `${w.r.score.toLocaleString('en-US')} pts` && w.m.rows[3][1] === `Drinks with the boss, ${w.r.score.toLocaleString('en-US')} pts`, 'score + best rows: ' + w.m.rows.slice(2).map(r => r[1]).join(' | '));
-  let saved = await page.evaluate(() => JSON.parse(localStorage.getItem('officeAffair.best.wednesday')));
+  let saved = await page.evaluate(() => JSON.parse(localStorage.getItem('officeAffair.best.office')));
   ok(saved && saved.ending === 'drinks' && saved.score === w.r.score && !('rank' in saved), 'best saved with ending: ' + JSON.stringify(saved));
   await page.screenshot({ path: out('shot-ending-drinks.png') });
 
@@ -98,7 +98,7 @@ const EXPECT = {
   ok(w.r.ending === 'rose' && w.r.score === expectScore(w) && Math.abs(hi - w.r.score - 1000) < 30, `2 catches: -1,000 -> rose (score ${w.r.score})`);
   ok(!w.m.newBest, 'no New best when the best is not beaten');
   ok(w.m.rows[3][1] === `Concert night, ${hi.toLocaleString('en-US')} pts`, 'best row still shows the concert: ' + w.m.rows[3][1]);
-  saved = await page.evaluate(() => JSON.parse(localStorage.getItem('officeAffair.best.wednesday')));
+  saved = await page.evaluate(() => JSON.parse(localStorage.getItem('officeAffair.best.office')));
   ok(saved.ending === 'concert' && saved.score === hi, 'saved best unchanged by a lower score');
 
   // menu best line
@@ -136,12 +136,12 @@ const EXPECT = {
   ok(errs.length === 0, 'no page errors ' + JSON.stringify(errs));
 
   // old bests (with a rank, on the old scale) are replaced
-  await page.evaluate(() => localStorage.setItem('officeAffair.best.wednesday', JSON.stringify({ score: 1400, rank: 'S-Rank', timeLeft: 30, strikes: 0 })));
+  await page.evaluate(() => localStorage.setItem('officeAffair.best.office', JSON.stringify({ score: 1400, rank: 'S-Rank', timeLeft: 30, strikes: 0 })));
   await page.reload(); await page.waitForTimeout(200);
   ok((await page.textContent('#bestLine')) === '', 'old rank best: no best line');
   await page.click('#btnPlay'); await page.click('#btnStart'); await page.waitForTimeout(200);
   w = await forceWin(page, 2700, 5);
-  saved = await page.evaluate(() => JSON.parse(localStorage.getItem('officeAffair.best.wednesday')));
+  saved = await page.evaluate(() => JSON.parse(localStorage.getItem('officeAffair.best.office')));
   ok(w.m.newBest && saved.ending === 'drinks' && !('rank' in saved), 'old rank best replaced by the first ending');
 
   // custom girl: names escaped in the memo head

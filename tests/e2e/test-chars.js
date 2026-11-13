@@ -51,7 +51,7 @@ const cards = page => page.$$eval('.pick-card', els => els.map(e => e.dataset.pi
   ok(await page.evaluate(() => cast.pick) === 'gabi', 'a hidden character cannot be picked');
 
   // A saved pick of a hidden character is not restored
-  await page.evaluate(() => localStorage.setItem('officeAffair.pick', JSON.stringify('alice')));
+  await page.evaluate(() => localStorage.setItem('officeAffair.pick.office', JSON.stringify('alice')));
   await page.reload(); await page.waitForTimeout(300);
   ok(await page.evaluate(() => cast.pick) === 'gabi' && await page.textContent('#plateL') === 'Gabi', 'saved hidden pick falls back to the first visible character');
 
