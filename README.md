@@ -45,6 +45,9 @@ Tuning lives in `MODES` in `js/config.js`. A mode holds everything a difficulty 
 | `css/style.css` | All styles |
 | `js/util.js` | Small helpers and the `localStorage` wrapper |
 | `js/config.js` | Game rules and tuning |
+| `js/stories.js` | Stories: which cast and poster a game uses (`?story=<id>`, e.g. `?story=nvidia`) |
+| `js/posters.js` | Poster artwork for stories |
+| `js/copy.js` | All the game's words (menu, toasts, the boss's thoughts, endings, memos). Edit text here; a story can override any line |
 | `js/characters.js` | Every character as data: the girls you can play, the "Make your own" defaults and wardrobe, the guy's names and palettes |
 | `js/cast.js` | Your pick, your saved custom girl, and the random guy |
 | `js/art.js` | SVG builders for the characters, hair styles, outfits, the guy, the boss and the walker |

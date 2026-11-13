@@ -474,8 +474,7 @@ class Renderer {
       this.thoughtT -= dt;
       if (this.thoughtT <= 0) {
         this.thoughtT = rand(5, 9);
-        let lines = ["Where's that report?", 'Is it Friday yet?', 'Interesting...', 'I sense a productivity issue.', 'Why is everyone smiling?', 'Need more synergy.', 'Who moved my stapler?'];
-        if (m.activity === 'phone' || this.mode === 'win') lines = ['Mm-hmm. Love that for us.', 'Let’s circle back.', 'Per my last email...'];
+        const lines = m.activity === 'phone' || this.mode === 'win' ? COPY.thoughts.phone : COPY.thoughts.idle;
         if (this.mode === 'win') this.thoughtT = 2.6;
         this.showThought(pick(lines));
       }
