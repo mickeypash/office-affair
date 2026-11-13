@@ -87,6 +87,21 @@ To add a hair style or an outfit, add a builder to `HAIR_ART`, `OUTFIT_ART` or `
 
 **https://mickey.sh/office-affair/**
 
+## Tests
+
+End-to-end suites live in `tests/e2e` (Playwright, headless Chromium). GitHub Actions runs them on every pull request and on pushes to `main` (`.github/workflows/test.yml`), one job per suite.
+
+To run them locally (optional):
+
+```bash
+npm ci && npx playwright install chromium
+npm test                 # every suite
+node tests/run.js story  # one suite (test-story.js)
+GAME_URL=https://mickey.sh/office-affair/ npm test   # against the live site
+```
+
+Screenshots go to `tests/e2e/shots/` (not committed). The game itself still has no dependencies and no build step; `package.json` is for the tests only.
+
 ## Publishing
 
 `.github/workflows/pages.yml` publishes the game to GitHub Pages on every push to `main`. You can also start it by hand from the **Actions** tab. It publishes only `index.html`, `css/` and `js/`.

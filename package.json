@@ -1,0 +1,11 @@
+{
+  "name": "office-affair",
+  "private": true,
+  "description": "Dev tooling only. The game itself has no dependencies and no build step.",
+  "scripts": {
+    "test": "node tests/run.js"
+  },
+  "devDependencies": {
+    "playwright": "1.58.2"
+  }
+}
