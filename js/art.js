@@ -1,6 +1,8 @@
 'use strict';
 /* SVG art builders for the characters */
 const SW = (w = 6) => `stroke="${INK}" stroke-width="${w}" stroke-linejoin="round" stroke-linecap="round"`;
+// The torso outline (body space). Outfits can redraw it, e.g. to lay a print over the outfit colour.
+const TORSO = 'M-106,80 L-96,-142 Q-92,-184 -50,-190 L50,-190 Q92,-184 96,-142 L106,80 Z';
 const limb = (d, color, w = 40) =>
   `<path d="${d}" fill="none" stroke="${INK}" stroke-width="${w + 12}" stroke-linecap="round"/>` +
   `<path d="${d}" fill="none" stroke="${color}" stroke-width="${w}" stroke-linecap="round"/>`;
@@ -14,7 +16,7 @@ function coworkerBody(o) {
     ${limb('M-86,-150 Q-114,-112 -108,-62', o.sleeve)}
     ${limb('M86,-150 Q114,-112 108,-62', o.sleeve)}
     <rect x="-19" y="-216" width="38" height="40" fill="${o.skin}" ${SW()}/>
-    <path d="M-106,80 L-96,-142 Q-92,-184 -50,-190 L50,-190 Q92,-184 96,-142 L106,80 Z" fill="${o.top}" ${SW()}/>
+    <path d="${TORSO}" fill="${o.top}" ${SW()}/>
     ${o.outfit}
     <g class="cw-head" transform="translate(0,-266)">
       ${o.hairBack}
@@ -193,7 +195,7 @@ const HAIR_ART = {
   },
 };
 
-// Outfits are drawn in body space (hip = 0,0). "sleeve" is the arm colour. svg gets (colour, look).
+// Outfits are drawn in body space (hip = 0,0). "sleeve" is the arm colour; sleeve and svg get (colour, look).
 const OUTFIT_ART = {
   laceTop: { // sheer black lace with wide bell sleeves (Gabi)
     sleeve: () => 'url(#lace)', top: () => 'url(#lace)',
@@ -230,6 +232,18 @@ const OUTFIT_ART = {
       <path d="M50,-190 L28,-190 L-4,-104 L14,-40 L40,-110 L66,-130 Z" fill="${tint(c, 0.7)}" ${SW(5)}/>
       <path d="M-14,-40 L-10,80 M14,-40 L10,80" fill="none" stroke="${tint(c, -0.11)}" stroke-width="5" stroke-linecap="round"/>
       <path d="M-86,-60 L-46,-60 M86,-40 L50,-40" stroke="${tint(c, -0.11)}" stroke-width="5" stroke-linecap="round"/>`,
+  },
+  floralDress: { // fitted red dress, mock neck, cap sleeves, floral print over c (Alice)
+    sleeve: (c, m) => m.skin,
+    svg: c => {
+      const print = d => `<path d="${d}" fill="${c}"/><path d="${d}" fill="url(#floralRed)" ${SW(5)}/>`;
+      // The torso is already filled with c; lay the print over it.
+      return `<path d="${TORSO}" fill="url(#floralRed)" ${SW()}/>` +
+        print('M-58,-189 Q-104,-184 -118,-150 L-131,-122 Q-112,-106 -92,-112 L-95,-150 Q-90,-180 -58,-189 Z') +
+        print('M58,-189 Q104,-184 118,-150 L131,-122 Q112,-106 92,-112 L95,-150 Q90,-180 58,-189 Z') +
+        `<path d="M-31,-183 Q-26,-194 -25,-209 Q0,-214 25,-209 Q26,-194 31,-183 Q0,-178 -31,-183 Z" fill="${tint(c, -0.12)}" ${SW(5)}/>
+        <path d="M-25,-200 Q0,-205 25,-200" fill="none" stroke="${tint(c, -0.32)}" stroke-width="3" stroke-linecap="round"/>`;
+    },
   },
   turtleneck: {
     sleeve: c => c,
@@ -315,7 +329,7 @@ function girlOpts(m, dir) {
   const hair = HAIR_ART[m.hairStyle] || HAIR_ART.wavy;
   const outfit = OUTFIT_ART[m.outfit] || OUTFIT_ART.turtleneck;
   return {
-    dir, skin: m.skin, top: outfit.top ? outfit.top(m.outfitColour) : m.outfitColour, sleeve: outfit.sleeve(m.outfitColour),
+    dir, skin: m.skin, top: outfit.top ? outfit.top(m.outfitColour) : m.outfitColour, sleeve: outfit.sleeve(m.outfitColour, m),
     outfit: outfit.svg(m.outfitColour, m), hairBack: hair.back(m.hair), hairFront: hair.front(m.hair),
     hairBehind: hair.behind ? hair.behind(m.hair) : '',
     smile: m.mouth === 'pout' ? POUT : m.mouth === 'smirk' ? SMIRK : (m.makeup ? LIP_SMILE : null),

@@ -28,8 +28,8 @@ const CHARACTERS = [
   },
   {
     id: 'alice', name: 'Alice', hidden: true,
-    look: { skin: '#F5D3BA', hairStyle: 'longStraight', hair: '#2A2434', outfit: 'coat', outfitColour: '#F5F1E8', glasses: false, makeup: false, mouth: null, earrings: true },
-    notes: 'From the old single-file game (HR). Long straight black hair, white coat over a black top, drop earrings.',
+    look: { skin: '#F5D3BA', hairStyle: 'longStraight', hair: '#2A2434', outfit: 'floralDress', outfitColour: '#BC2238', glasses: false, makeup: false, mouth: null, earrings: true },
+    notes: 'From the old single-file game (HR). Long straight black hair, drop earrings, fitted red floral dress (mock neck, cap sleeves, oxblood branches, gold leaves, pale flowers).',
   },
 ];
 
@@ -77,7 +77,7 @@ const OUTFIT_COLOURS = [
   ['#FF4F86', 'Pink'], ['#5DB58C', 'Green'], ['#4A4560', 'Charcoal'], ['#F3F0FA', 'White'],
 ];
 const HAIR_STYLES = { wavy: 'Long waves', sleek: 'Sleek', bob: 'Bob', bun: 'Bun', curls: 'Curls', crop: 'Crop' };
-const OUTFITS = { laceTop: 'Lace top', blazer: 'Blazer', cardigan: 'Cardigan', turtleneck: 'Turtleneck' };
+const OUTFITS = { laceTop: 'Lace top', blazer: 'Blazer', cardigan: 'Cardigan', turtleneck: 'Turtleneck', floralDress: 'Floral dress' };
 const NAME_MAX = 14;
 
 /* Who shows on the picker: the story's girls (see js/stories.js), else every character that is not hidden,
