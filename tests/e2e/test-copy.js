@@ -16,7 +16,7 @@ const ok = (c, m) => { console.log((c ? 'PASS ' : 'FAIL ') + m); if (!c) process
     return {
       same: COPY === COPY_DEFAULT || JSON.stringify(COPY) === JSON.stringify(COPY_DEFAULT),
       empty: all.filter(([, v]) => Array.isArray(v) ? !v.length || v.some(s => typeof s !== 'string' || !s.trim()) : typeof v !== 'string' || !v.trim()).map(([k]) => k),
-      endings: Object.keys(CONFIG.endings).every(k => COPY.endings[k] && ['name', 'title', 'stamp', 'to', 'from', 're', 'sub'].every(f => COPY.endings[k][f])),
+      endings: CONFIG.endings.length === 3 && CONFIG.endings.every(({ key: k }) => COPY.endings[k] && ['name', 'title', 'stamp', 'to', 'from', 're', 'sub'].every(f => COPY.endings[k][f])),
       endingObjs: Object.keys(ENDINGS).every(k => ENDINGS[k].name === COPY.endings[k].name && typeof ENDINGS[k].sub === 'string' && ENDINGS[k].icon),
     };
   });
