@@ -4,33 +4,35 @@ const ICON_SOUND_ON = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9
 const ICON_SOUND_OFF = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4z" fill="#fff"/><path d="M16 9l6 6M22 9l-6 6" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/></svg>';
 const CHANCE_SVG = '<svg class="chance" viewBox="-18 -24 36 34" aria-hidden="true"><path class="fillp" d="M0 8 C -4 4 -16 -2 -16 -10 C -16 -17 -10 -21 -5 -21 C -2 -21 0 -19 0 -16 C 0 -19 2 -21 5 -21 C 10 -21 16 -17 16 -10 C 16 -2 4 4 0 8 Z" fill="#FF4F86" stroke="#2B2340" stroke-width="3" stroke-linejoin="round"/><path class="crack" d="M0 -16 L-4 -8 L3 -3 L-2 6" fill="none" stroke="#2B2340" stroke-width="3" stroke-linejoin="round"/></svg>';
 
-// Win endings, keyed by CONFIG.endings. sub gets the plain names; re gets the girl's name already escaped for HTML.
+// Win endings, keyed by CONFIG.endings: number and icon here; the words (name, title, stamp, memo, sub) come from COPY.endings.
 const INK_LINE = 'stroke="#2B2340" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"';
 const ENDINGS = {
   drinks: {
-    n: 1, name: 'Drinks with the boss', title: 'THE BOSS IS BUYING', stamp: 'AWKWARD',
-    from: 'Your boss', re: g => `Drinks after work (just ${g})`,
-    sub: (g, b) => `The boss asked ${g} out for drinks. ${b} went home alone.`,
+    n: 1,
     icon: `<svg viewBox="0 0 48 48" aria-hidden="true"><path d="M7 9h34L24 27Z" fill="#E9F6FA" ${INK_LINE}/><path d="M12.5 14h23L24 27Z" fill="#FF8FAB"/><path d="M7 9h34L24 27Z" fill="none" ${INK_LINE}/><path d="M24 27v13M15 42h18" fill="none" ${INK_LINE}/><path d="M31 3 21 18" fill="none" ${INK_LINE} stroke-width="2.5"/><circle cx="22.5" cy="15.5" r="4" fill="#7DBA4A" ${INK_LINE} stroke-width="2.5"/></svg>`,
   },
   rose: {
-    n: 2, name: 'A rose at 7', title: "IT'S A DATE!", stamp: '7:00 PM',
-    from: 'Department of Hearts', re: () => 'Leaving together at 7 pm',
-    sub: (g, b) => `${g} & ${b} left together at 7 pm. ${b} brought a rose.`,
+    n: 2,
     icon: `<svg viewBox="0 0 48 48" aria-hidden="true"><path d="M24 25c0 7-1 12 0 19" fill="none" stroke="#2B2340" stroke-width="7" stroke-linecap="round"/><path d="M24 25c0 7-1 12 0 19" fill="none" stroke="#5DB58C" stroke-width="3" stroke-linecap="round"/><path d="M24 35c4-5 10-6 13-4-3 5-9 6-13 4Z" fill="#5DB58C" ${INK_LINE} stroke-width="2.5"/><path d="M12 12c4-3 8-2 12 1 4-3 8-4 12-1 1 9-4 15-12 15S11 21 12 12Z" fill="#E8364F" ${INK_LINE}/><path d="M18 13c3-3 9-3 10 1 1 4-4 5-6 3m-4-4c-1 4 2 8 7 8" fill="none" ${INK_LINE} stroke-width="2.2"/></svg>`,
   },
   concert: {
-    n: 3, name: 'Concert night', title: 'FRONT ROW!', stamp: 'ENCORE!',
-    from: 'Department of Hearts', re: () => 'Two tickets, tonight',
-    sub: (g, b) => `${g} & ${b} are off to a concert. Two tickets, no boss.`,
+    n: 3,
     icon: `<svg viewBox="0 0 48 48" aria-hidden="true"><g transform="rotate(-14 24 28)"><path d="M7 18h34v6a4 4 0 0 0 0 8v6H7v-6a4 4 0 0 0 0-8Z" fill="#FFC23A" ${INK_LINE}/><path d="M32 19v18" fill="none" stroke="#2B2340" stroke-width="2" stroke-dasharray="3 3"/><path d="M15 34V24l9-2v10" fill="none" ${INK_LINE} stroke-width="2.5"/><ellipse cx="13" cy="34" rx="3" ry="2.4" fill="#2B2340"/><ellipse cx="22" cy="32" rx="3" ry="2.4" fill="#2B2340"/></g><path d="M37 13V3l6 3" fill="none" ${INK_LINE} stroke-width="2.5"/><ellipse cx="34.5" cy="13" rx="3" ry="2.4" fill="#FF4F86" ${INK_LINE} stroke-width="2"/></svg>`,
   },
 };
+for (const k of Object.keys(ENDINGS)) Object.assign(ENDINGS[k], COPY.endings[k]);
 const fmtPts = n => Math.round(n).toLocaleString('en-US');
 
 const ui = {
   el: {},
+  /* Fill the static text in index.html from COPY (elements with data-copy / data-copy-html="a.b.c"). */
+  applyCopy() {
+    const get = key => key.split('.').reduce((o, k) => (o == null ? o : o[k]), COPY);
+    document.querySelectorAll('[data-copy]').forEach(el => { const v = get(el.dataset.copy); if (v != null) el.textContent = v; });
+    document.querySelectorAll('[data-copy-html]').forEach(el => { const v = get(el.dataset.copyHtml); if (v != null) el.innerHTML = v; });
+  },
   init() {
+    this.applyCopy();
     ['hud', 'controls', 'stage', 'meter', 'meterFill', 'meterPct', 'meterHeart', 'timer', 'timerText', 'strikes', 'btnSoundHud', 'btnPause',
       'toast', 'countdown', 'menu', 'pause', 'result', 'btnPlay', 'btnSoundMenu', 'bestLine', 'btnResume', 'btnRestart', 'btnQuit',
       'btnAgain', 'btnMenu', 'resultHead', 'resultTitle', 'resultSub', 'resultEnding', 'resultStats', 'resultStamp', 'kissBtn']
@@ -146,9 +148,9 @@ const ui = {
     const rows = [];
     if (r.kind === 'win') {
       const end = ENDINGS[r.ending], g = cast.girlName(), b = cast.guyName();
-      e.resultHead.innerHTML = `<div><b>TO:</b> ${esc(g)} &amp; ${esc(b)}</div><div><b>FROM:</b> ${end.from}</div><div><b>RE:</b> ${end.re(esc(g))}</div>`;
+      e.resultHead.innerHTML = memoHead(end, { girl: g, guy: b });
       e.resultTitle.textContent = end.title;
-      e.resultSub.textContent = end.sub(g, b);
+      e.resultSub.textContent = fill(end.sub, { girl: g, guy: b });
       e.resultEnding.innerHTML = `${end.icon}<div><small>Ending ${end.n} of 3</small>${end.name}` + (r.newBest ? '<span class="newbest">New best</span>' : '') + '</div>';
       e.resultEnding.style.display = '';
       rows.push(['Time remaining', fmtTime(r.timeLeft)], ['Times caught', String(r.strikes)], ['Score', `${fmtPts(r.score)} pts`]);
@@ -156,19 +158,21 @@ const ui = {
       if (bestEnd) rows.push(['Best result', `${bestEnd.name}, ${fmtPts(r.best.score)} pts`]);
       e.resultStamp.textContent = end.stamp; e.resultStamp.className = 'stamp';
     } else if (r.kind === 'hr') {
-      e.resultHead.innerHTML = `<div><b>TO:</b> ${esc(cast.girlName())}</div>` + '<div><b>FROM:</b> Human Resources</div><div><b>RE:</b> Mandatory meeting, 9 am</div>';
-      e.resultTitle.textContent = 'MEETING WITH HR 📋';
-      e.resultSub.textContent = 'Your workplace conduct is under review.';
+      const m = COPY.losses.hr, names = { girl: cast.girlName(), guy: cast.guyName() };
+      e.resultHead.innerHTML = memoHead(m, names);
+      e.resultTitle.textContent = fill(m.title, names);
+      e.resultSub.textContent = fill(m.sub, names);
       e.resultEnding.style.display = 'none';
       rows.push(['Final romance', `${Math.floor(r.romance)}%`], ['Times caught', String(r.strikes)], ['Time remaining', fmtTime(r.timeLeft)]);
-      e.resultStamp.textContent = 'UNDER REVIEW'; e.resultStamp.className = 'stamp red';
+      e.resultStamp.textContent = m.stamp; e.resultStamp.className = 'stamp red';
     } else {
-      e.resultHead.innerHTML = '<div><b>TO:</b> All staff</div><div><b>FROM:</b> Facilities</div><div><b>RE:</b> Building closes at 5 pm</div>';
-      e.resultTitle.textContent = 'CLOCKED OUT 💔';
-      e.resultSub.textContent = 'Another day, another missed connection.';
+      const m = COPY.losses.time, names = { girl: cast.girlName(), guy: cast.guyName() };
+      e.resultHead.innerHTML = memoHead(m, names);
+      e.resultTitle.textContent = fill(m.title, names);
+      e.resultSub.textContent = fill(m.sub, names);
       e.resultEnding.style.display = 'none';
       rows.push(['Final romance', `${Math.floor(r.romance)}%`], ['Times caught', String(r.strikes)]);
-      e.resultStamp.textContent = '5:00 PM'; e.resultStamp.className = 'stamp red';
+      e.resultStamp.textContent = m.stamp; e.resultStamp.className = 'stamp red';
     }
     e.resultStats.innerHTML = rows.map(([a, b]) => `<tr><td>${a}</td><td>${b}</td></tr>`).join('');
     this.showOverlay('result');

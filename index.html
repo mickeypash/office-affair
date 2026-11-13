@@ -420,11 +420,11 @@
 <!-- Menu -->
 <section id="menu" class="overlay show" aria-labelledby="gameTitle">
   <div class="menu-inner">
-    <h1 class="title" id="gameTitle"><span>OFFICE</span><span>AFFAIR</span></h1>
-    <p class="subtitle">Love is a full-time job.</p>
+    <h1 class="title" id="gameTitle"><span data-copy="menu.title.0"></span><span data-copy="menu.title.1"></span></h1>
+    <p class="subtitle" data-copy="menu.tagline"></p>
     <ul class="howto">
-      <li><svg viewBox="-18 -24 36 34" aria-hidden="true"><use href="#heartShape" fill="#FF4F86" stroke="#2B2340" stroke-width="2.5"/></svg><span>Hold <b>Space</b>, <b>Shift</b> or the mouse to kiss.</span></li>
-      <li><svg viewBox="-36 -38 72 70" aria-hidden="true"><path d="M0 -34 L34 26 L-34 26 Z" fill="#FFC23A" stroke="#2B2340" stroke-width="6" stroke-linejoin="round"/><rect x="-4" y="-16" width="8" height="24" rx="4" fill="#2B2340"/><circle cy="16" r="4.5" fill="#2B2340"/></svg><span>Let go before the boss turns around.</span></li>
+      <li><svg viewBox="-18 -24 36 34" aria-hidden="true"><use href="#heartShape" fill="#FF4F86" stroke="#2B2340" stroke-width="2.5"/></svg><span data-copy-html="menu.howtoKiss"></span></li>
+      <li><svg viewBox="-36 -38 72 70" aria-hidden="true"><path d="M0 -34 L34 26 L-34 26 Z" fill="#FFC23A" stroke="#2B2340" stroke-width="6" stroke-linejoin="round"/><rect x="-4" y="-16" width="8" height="24" rx="4" fill="#2B2340"/><circle cy="16" r="4.5" fill="#2B2340"/></svg><span data-copy="menu.howtoBoss"></span></li>
     </ul>
     <div class="menu-actions">
       <button class="btn primary" id="btnPlay">Play</button>
@@ -437,7 +437,7 @@
 <!-- Who's clocking in? (pick who you play) -->
 <section id="select" class="overlay" role="dialog" aria-labelledby="selectTitle">
   <div class="select-panel">
-    <h2 class="cust-title" id="selectTitle">Who's clocking in?</h2>
+    <h2 class="cust-title" id="selectTitle" data-copy="select.title"></h2>
     <div class="pick-cards" role="radiogroup" aria-labelledby="selectTitle">
       <!-- A card for each visible girl in CHARACTERS (js/characters.js) is added here by customise.js. -->
       <div class="pick-slot">
@@ -478,9 +478,9 @@
 <!-- Pause -->
 <section id="pause" class="overlay" role="dialog" aria-modal="true" aria-labelledby="pauseTitle">
   <div class="memo">
-    <div class="memo-head"><div><b>TO:</b> <span id="pauseTo">Gabi</span></div><div><b>FROM:</b> The break room</div><div><b>RE:</b> Coffee break</div></div>
-    <h2 id="pauseTitle">Paused</h2>
-    <p class="sub">The boss can't see you. Probably.</p>
+    <div class="memo-head"><div><b>TO:</b> <span id="pauseTo">Gabi</span></div><div><b>FROM:</b> <span data-copy="pause.from"></span></div><div><b>RE:</b> <span data-copy="pause.re"></span></div></div>
+    <h2 id="pauseTitle" data-copy="pause.title"></h2>
+    <p class="sub" data-copy="pause.sub"></p>
     <div class="memo-actions">
       <button class="btn primary" id="btnResume">Resume</button>
       <button class="btn" id="btnRestart">Restart</button>
@@ -509,6 +509,7 @@
 <script src="js/config.js"></script>
 <script src="js/stories.js"></script>
 <script src="js/posters.js"></script>
+<script src="js/copy.js"></script>
 <script src="js/characters.js"></script>
 <script src="js/art.js"></script>
 <script src="js/cast.js"></script>

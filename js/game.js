@@ -1,6 +1,5 @@
 'use strict';
 /* Game: lifecycle, finite-state machine */
-const CAUGHT_LINES = ['HR would like a word.', "That spreadsheet won't save you.", 'HR would like a word.', 'Caught red-lipped!'];
 
 class Game {
   constructor() {
@@ -74,7 +73,7 @@ class Game {
         if (this.cdT <= 0) {
           ui.countdown('GO!'); sfx.count(true);
           this.setState(S.PLAYING);
-          setTimeout(() => { if (this.state === S.PLAYING) ui.toast('The boss is distracted...', '', 1, 1600); }, 650);
+          setTimeout(() => { if (this.state === S.PLAYING) ui.toast(COPY.toasts.distracted, '', 1, 1600); }, 650);
         }
         break;
       }
@@ -120,8 +119,8 @@ class Game {
     if (kissing) this.romance = Math.min(100, this.romance + this.rules.romanceRate * fill * dt);
     lives.onRomance(this);
 
-    if (!this.said50 && this.romance >= 50) { this.said50 = true; ui.toast('Halfway there. Keep it professional.', 'love', 1); }
-    if (!this.said85 && this.romance >= 85) { this.said85 = true; ui.toast('So close. The boss is getting twitchy.', 'love', 1); }
+    if (!this.said50 && this.romance >= 50) { this.said50 = true; ui.toast(COPY.toasts.halfway, 'love', 1); }
+    if (!this.said85 && this.romance >= 85) { this.said85 = true; ui.toast(COPY.toasts.almost, 'love', 1); }
 
     if (this.romance >= 100) { this.end('win'); return; }
     if (this.timeLeft <= 0) { this.end('time'); return; }
@@ -133,18 +132,18 @@ class Game {
   onStopKiss() {
     renderer.actNatural();
     const m = this.manager;
-    if (this.watchedMs > 0) ui.toast('Unprofessional. Impressive.', 'love', 2);
-    else if (m.state === M.SUSPICIOUS && !m.fake && this.rules.warningToasts) ui.toast('Act natural!', 'warn', 2);
+    if (this.watchedMs > 0) ui.toast(COPY.toasts.escaped, 'love', 2);
+    else if (m.state === M.SUSPICIOUS && !m.fake && this.rules.warningToasts) ui.toast(COPY.toasts.actNatural, 'warn', 2);
   }
 
   onManager(state, prev, info) {
     if (this.state !== S.PLAYING) return;
     if (state === M.SUSPICIOUS) {
       if (info.fake) sfx.hmm();
-      else { sfx.warn(); if (this.rules.warningToasts) ui.toast("Uh-oh. Someone's watching.", 'warn', 2, 1300); }
+      else { sfx.warn(); if (this.rules.warningToasts) ui.toast(COPY.toasts.watching, 'warn', 2, 1300); }
     } else if (state === M.DISTRACTED) {
-      if (info.fromFake) ui.toast(info.kind === 'phone' ? 'False alarm. He switched ears.' : 'False alarm. Just a stretch.', '', 1, 1400);
-      else if (!info.afterCaught && prev === M.RETURNING) ui.toast('The boss is distracted...', '', 1, 1300);
+      if (info.fromFake) ui.toast(info.kind === 'phone' ? COPY.toasts.falseAlarmPhone : COPY.toasts.falseAlarmStretch, '', 1, 1400);
+      else if (!info.afterCaught && prev === M.RETURNING) ui.toast(COPY.toasts.distracted, '', 1, 1300);
     }
   }
 
@@ -159,7 +158,7 @@ class Game {
     this.freezeT = CONFIG.freeze;
     renderer.caught();
     sfx.caught();
-    ui.toast(out ? 'HR would like a word.' : pick(CAUGHT_LINES), 'alarm', 3, 1500);
+    ui.toast(out ? COPY.toasts.caughtOut : pick(COPY.toasts.caught), 'alarm', 3, 1500);
   }
 
   end(kind) {
@@ -182,12 +181,12 @@ class Game {
       }
       r.best = store.get(key, null);
       renderer.win(); sfx.win(); confetti.start(3.2);
-      ui.toast('Love wins. Productivity loses.', 'love', 3, 2200);
+      ui.toast(COPY.toasts.win, 'love', 3, 2200);
       this.endT = 2.0;
     } else {
       this.setState(S.LOST);
       renderer.lose(kind); sfx.lose();
-      if (kind === 'time') ui.toast("It's 5 pm. Everyone's going home.", '', 3, 2000);
+      if (kind === 'time') ui.toast(COPY.toasts.timeUp, '', 3, 2000);
       this.endT = 1.5;
     }
     this.result = r;
