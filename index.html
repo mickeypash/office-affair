@@ -35,6 +35,36 @@
         <pattern id="lace" width="9" height="9" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
           <rect width="9" height="9" fill="#2A2430"/><path d="M0,4.5 H9 M4.5,0 V9" stroke="#3C3545" stroke-width="1"/><circle cx="4.5" cy="4.5" r="1.3" fill="#4A4254"/>
         </pattern>
+        <!-- Floral print (Alice's dress): oxblood branches, gold leaves, pale flowers. No background: it sits over the outfit colour. -->
+        <path id="flLeaf" d="M0,0 Q7.5,-8 0,-18 Q-7.5,-8 0,0 Z"/>
+        <g id="flDots" fill="#A8701E" stroke="none"><circle cy="-4.5" r="1.1"/><circle cx="-2" cy="-9" r="1.1"/><circle cx="2" cy="-9" r="1.1"/><circle cy="-13.5" r="1.1"/></g>
+        <g id="flCluster">
+          <use href="#flLeaf" transform="rotate(-72)"/><use href="#flLeaf" transform="rotate(-36)"/><use href="#flLeaf"/>
+          <use href="#flLeaf" transform="rotate(36)"/><use href="#flLeaf" transform="rotate(72)"/>
+        </g>
+        <g id="flClusterDot">
+          <use href="#flCluster"/>
+          <use href="#flDots" transform="rotate(-72)"/><use href="#flDots" transform="rotate(-36)"/><use href="#flDots"/>
+          <use href="#flDots" transform="rotate(36)"/><use href="#flDots" transform="rotate(72)"/>
+        </g>
+        <g id="flFlower" fill="#E4DEE1" stroke="#7E6E78" stroke-width=".8">
+          <circle cy="-4.2" r="3.7"/><circle cx="4" cy="-1.3" r="3.7"/><circle cx="2.5" cy="3.4" r="3.7"/>
+          <circle cx="-2.5" cy="3.4" r="3.7"/><circle cx="-4" cy="-1.3" r="3.7"/><circle r="1.9" fill="#C9962E" stroke="none"/>
+        </g>
+        <pattern id="floralRed" width="90" height="90" patternUnits="userSpaceOnUse" patternTransform="rotate(-28)">
+          <g fill="#7A1426">
+            <ellipse cx="38" cy="40" rx="11" ry="5" transform="rotate(-35 38 40)"/><ellipse cx="74" cy="74" rx="10" ry="4.5" transform="rotate(30 74 74)"/>
+            <ellipse cx="10" cy="44" rx="9" ry="4" transform="rotate(60 10 44)"/><ellipse cx="62" cy="10" rx="8" ry="4" transform="rotate(-20 62 10)"/>
+          </g>
+          <path d="M0,58 C15,50 30,68 45,58 C60,48 75,66 90,58" fill="none" stroke="#5E1020" stroke-width="4.5" stroke-linecap="round"/>
+          <path d="M26,61 Q32,44 22,30 M22,30 L13,22 M48,57 Q52,66 56,72 M66,56 Q70,40 74,32 M74,32 L82,24" fill="none" stroke="#5E1020" stroke-width="3" stroke-linecap="round"/>
+          <g fill="#D49A35" stroke="#7A3E16" stroke-width=".9">
+            <use href="#flCluster" x="22" y="30"/><use href="#flCluster" transform="translate(74,32) rotate(25)"/>
+            <use href="#flLeaf" transform="translate(86,88) rotate(-140)"/><use href="#flLeaf" transform="translate(4,6) rotate(140)"/>
+          </g>
+          <g fill="#E3B455" stroke="#7A3E16" stroke-width=".9"><use href="#flClusterDot" transform="translate(56,72) rotate(110)"/></g>
+          <use href="#flFlower" x="46" y="20"/><use href="#flFlower" x="14" y="80"/>
+        </pattern>
         <linearGradient id="hairGabi" x1="0" y1="0" x2="0" y2="1">
           <stop offset="0" stop-color="#3E261C"/><stop offset=".45" stop-color="#5E3A28"/><stop offset=".8" stop-color="#8E6040"/><stop offset="1" stop-color="#B08058"/>
         </linearGradient>
