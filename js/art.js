@@ -484,7 +484,8 @@ function managerSVG() {
   </g>`;
 }
 
-function walkerSVG() {
+/* The walker. load: markup for what he carries (inside #wCups, stacked up from 0); default a coffee tower. */
+function walkerSVG(load = null) {
   const cups = Array.from({ length: 6 }, (_, i) => `
     <g transform="translate(0,${-i * 36})">
       <path d="M-22,0 L22,0 L18,-34 L-18,-34 Z" fill="#fff" ${SW(4)}/>
@@ -502,6 +503,6 @@ function walkerSVG() {
     <path d="M-30,-244 Q-24,-276 6,-272 Q30,-268 32,-240 Q14,-256 -30,-244 Z" fill="${INK}"/>
     <path d="M-12,-226 L-12,-220 M12,-226 L12,-220" ${SW(5)}/>
     <ellipse cx="0" cy="-210" rx="6" ry="5" fill="#7A2840"/>
-    <g id="wCups" transform="translate(0,-262)">${cups}</g>`;
+    <g id="wCups" transform="translate(0,-262)">${load || cups}</g>`;
 }
 

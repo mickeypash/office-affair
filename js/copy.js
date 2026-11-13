@@ -14,6 +14,8 @@ const COPY_DEFAULT = {
     howtoBoss: 'Let go before the boss turns around.',
   },
   select: { title: "Who's clocking in?" },
+  // Words drawn in the office scene: the sign over the printer when it jams.
+  scene: { jam: 'JAM!' },
   pause: {
     from: 'The break room', re: 'Coffee break',
     title: 'Paused', sub: "The boss can't see you. Probably.",

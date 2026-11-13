@@ -4,7 +4,7 @@ class Renderer {
   constructor() {
     this.scene = $('scene');
     $('mgrBody').innerHTML = managerSVG();
-    $('walker').innerHTML = walkerSVG();
+    $('walker').innerHTML = walkerSVG(scenePart('walkerLoad'));
     this.chars = {};
     this.buildChar('L');
     this.buildChar('R');
@@ -16,6 +16,7 @@ class Renderer {
       'plantL', 'plantR', 'hearts', 'notes'];
     this.el = {};
     ids.forEach(id => { this.el[id] = $(id); });
+    this.lightOn = this.el.printerLight.getAttribute('fill'); // the printer's idle light (a story's scene may recolour it)
     const phoneArm = g => ({ paths: [...g.children].filter(n => n.tagName === 'path'), hand: g.querySelector('.phone-hand'), k: 0 });
     this.phoneArms = { R: phoneArm(this.el.actPhone), L: phoneArm(this.el.actPhoneL) };
     ['streakBadge', 'streakText', 'streakShadow', 'streakFever'].forEach(id => { this.el[id] = $(id); });
@@ -547,7 +548,7 @@ class Renderer {
       this.jamT -= dt;
       const on = this.jamT > 0;
       vis(e.jamText, on); vis(e.jamPapers, on);
-      e.printerLight.setAttribute('fill', on && Math.sin(t * 20) > 0 ? '#E5392B' : '#5DB58C');
+      e.printerLight.setAttribute('fill', on && Math.sin(t * 20) > 0 ? '#E5392B' : this.lightOn);
       e.printerBody.setAttribute('transform', on && !REDUCED ? `translate(${(Math.sin(t * 70) * 2.5).toFixed(2)},0)` : '');
       const k = 1 - clamp(this.jamT / 1.6, 0, 1);
       [e.jp0, e.jp1, e.jp2].forEach((p, i) => {
