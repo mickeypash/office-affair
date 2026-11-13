@@ -1,5 +1,6 @@
 'use strict';
 /* Boot, layout, input wiring and the main loop */
+if (STORY.poster && POSTERS[STORY.poster]) $('poster').innerHTML = POSTERS[STORY.poster];
 const renderer = new Renderer();
 const game = new Game();
 ui.init();

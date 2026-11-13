@@ -80,9 +80,12 @@ const HAIR_STYLES = { wavy: 'Long waves', sleek: 'Sleek', bob: 'Bob', bun: 'Bun'
 const OUTFITS = { laceTop: 'Lace top', blazer: 'Blazer', cardigan: 'Cardigan', turtleneck: 'Turtleneck' };
 const NAME_MAX = 14;
 
-/* Who shows on the picker: every character that is not hidden, or all of them with ?cast=all. */
+/* Who shows on the picker: the story's girls (see js/stories.js), else every character that is not hidden,
+   or all of them with ?cast=all. */
 const SHOW_HIDDEN = new URLSearchParams(location.search).get('cast') === 'all';
-const PLAYABLE = CHARACTERS.filter(c => SHOW_HIDDEN || !c.hidden);
+const PLAYABLE = STORY.girls
+  ? STORY.girls.map(id => CHARACTERS.find(c => c.id === id)).filter(Boolean)
+  : CHARACTERS.filter(c => SHOW_HIDDEN || !c.hidden);
 const NAMED_GUYS = GUY_CHARACTERS.filter(c => SHOW_HIDDEN || !c.hidden);
 
 /* Old names, derived from the data above. GIRLS has every character (hidden too); PLAYABLE decides who can be picked. */
