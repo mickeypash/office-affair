@@ -64,11 +64,12 @@ window.addEventListener('keyup', e => {
 // Any tap or key (re)starts the sound: mobile browsers only allow it from a user gesture.
 ['touchend', 'click', 'keydown'].forEach(t => document.addEventListener(t, () => sfx.unlock(), { passive: true }));
 
-// A soft click for buttons on the menu, "Who's clocking in?" and the wardrobe.
-// Not for Play on the picker (the countdown beeps start) or the sound button (it clicks already).
-['menu', 'select', 'customise'].forEach(id => $(id).addEventListener('click', e => {
+// A soft click for buttons on the menu, "Who's clocking in?", the wardrobe, pause and result screens.
+// Not for buttons that start a round (the countdown beeps start) or the sound button (it clicks already).
+const NO_CLICK = ['btnStart', 'btnRestart', 'btnAgain', 'btnSoundMenu'];
+['menu', 'select', 'customise', 'pause', 'result'].forEach(id => $(id).addEventListener('click', e => {
   const b = e.target.closest('button');
-  if (b && b.id !== 'btnStart' && b.id !== 'btnSoundMenu') { sfx.unlock(); sfx.click(); }
+  if (b && !NO_CLICK.includes(b.id)) { sfx.unlock(); sfx.click(); }
 }));
 
 // Pointer on the stage and on the kiss button
