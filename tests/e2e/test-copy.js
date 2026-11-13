@@ -1,6 +1,7 @@
 const path = require('path');
 const { chromium } = require('playwright');
-const url = process.env.GAME_URL || ('file://' + path.resolve(__dirname, '../../index.html'));
+// Gabi and Vix live in the office story; these suites test it whatever the default story is.
+const url = process.env.GAME_URL || ('file://' + path.resolve(__dirname, '../../index.html') + '?story=office');
 const ok = (c, m) => { console.log((c ? 'PASS ' : 'FAIL ') + m); if (!c) process.exitCode = 1; };
 (async () => {
   const b = await chromium.launch();
