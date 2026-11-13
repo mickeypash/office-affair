@@ -17,15 +17,22 @@ const sep = url.includes('?') ? '&' : '?';
   };
   await go(); await page.evaluate(() => localStorage.clear()); await go();
 
-  // Default game is unchanged
-  ok(await page.evaluate(() => STORY.id) === 'office', 'no ?story: the office story');
-  ok((await page.textContent('#poster')).includes('ISABEL MARANT'), 'office poster is unchanged');
+  // No ?story: the default story (DEFAULT_STORY, today nvidia)
+  ok(await page.evaluate(() => DEFAULT_STORY) === 'nvidia' && await page.evaluate(() => STORY.id) === 'nvidia', 'no ?story: the default story, nvidia');
+  ok((await page.textContent('#poster')).includes('NVIDIA'), 'default poster is NVIDIA');
   await page.click('#btnPlay');
-  ok(await cards(page) === 'gabi,vix,custom', 'office picker: Gabi, Vix, Make your own');
+  ok(await cards(page) === 'alice,kimberly,custom', 'default picker: Alice, Kimberly, Make your own');
   for (const q of ['story=nope', 'story=toString', 'story=__proto__', 'story=']) {
     await go(q);
-    ok(await page.evaluate(() => STORY.id) === 'office' && (await page.textContent('#poster')).includes('ISABEL MARANT'), `?${q} falls back to the office`);
+    ok(await page.evaluate(() => STORY.id) === 'nvidia' && (await page.textContent('#poster')).includes('NVIDIA'), `?${q} falls back to the default story`);
   }
+
+  // ?story=office: Gabi and Vix, a random guy, the office poster
+  await go('story=office');
+  ok(await page.evaluate(() => STORY.id) === 'office', '?story=office selects the office');
+  ok((await page.textContent('#poster')).includes('ISABEL MARANT'), 'office poster');
+  await page.click('#btnPlay');
+  ok(await cards(page) === 'gabi,vix,custom', 'office picker: Gabi, Vix, Make your own');
 
   // ?story=nvidia: Alice and Kimberly, Jensen every round, NVIDIA poster
   await go('story=nvidia');
@@ -66,7 +73,7 @@ const sep = url.includes('?') ? '&' : '?';
   ok(keys.officePick === null && keys.officeBest === null, 'office save keys are untouched');
   await go('story=nvidia');
   ok(await page.evaluate(() => cast.pick) === 'kimberly', 'the story pick is restored');
-  await go();
+  await go('story=office');
   ok(await page.evaluate(() => cast.pick) === 'gabi' && await page.textContent('#plateL') === 'Gabi', 'the office pick is separate (Gabi)');
   ok((await page.textContent('#plateR')) !== 'Jensen' || await page.evaluate(() => NAMED_GUYS.length === 0), 'the office guy is random again');
   ok(await page.evaluate(() => Array.from({ length: 200 }, () => cast.rollGuy().name).every(n => n !== 'Jensen')), 'office never rolls Jensen while he is hidden');
