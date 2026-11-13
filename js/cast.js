@@ -1,5 +1,5 @@
 'use strict';
-/* The cast: who you play (a girl from CHARACTERS or your own girl) and tonight's random guy.
+/* The cast: who you play (a girl from CHARACTERS or your own girl) and tonight's guy (random, or a named one).
    Your pick and your custom girl are saved in localStorage. The guy is new every round.
    Only visible characters (PLAYABLE) can be picked; a saved pick of anyone else falls back to the first one. */
 const PICKS = [...PLAYABLE.map(c => c.id), 'custom'];
@@ -32,7 +32,12 @@ const cast = {
   girl() { return this.pick === 'custom' ? this.custom : GIRLS[this.pick]; },
   girlName() { return this.girl().name; },
   guyName() { return this.guy.name; },
-  rollGuy() { this.guy = randomGuy(); return this.guy; },
+  // Usually a random guy; sometimes a visible named guy (GUY_CHARACTERS).
+  rollGuy() {
+    const named = NAMED_GUYS.length && Math.random() < GUYS.namedChance ? pick(NAMED_GUYS) : null;
+    this.guy = named ? { id: named.id, name: named.name, ...named.look } : randomGuy();
+    return this.guy;
+  },
   // Custom girl editing
   ensureCustom() { if (!this.custom) { this.custom = { ...DEFAULT_CUSTOM }; this.saveCustom(); } return this.custom; },
   setCustom(key, value) { this.custom = cleanGirl({ ...this.custom, [key]: value }); this.saveCustom(); },

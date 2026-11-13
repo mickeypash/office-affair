@@ -10,6 +10,7 @@ function coworkerBody(o) {
   const X = v => v * d;
   return `
   <g class="cw"${o.male ? ' data-male="1"' : ''}>
+    ${o.hairBehind || ''}
     ${limb('M-86,-150 Q-114,-112 -108,-62', o.sleeve)}
     ${limb('M86,-150 Q114,-112 108,-62', o.sleeve)}
     <rect x="-19" y="-216" width="38" height="40" fill="${o.skin}" ${SW()}/>
@@ -90,6 +91,9 @@ function coworkerHands(o) {
   </g>`;
 }
 
+/* A shade of a hex colour. Other values (like url(#gradient)) come back unchanged. */
+const tint = (c, amt) => /^#[0-9a-f]{6}$/i.test(c) ? shade(c, amt) : c;
+
 /* ---- Customisable parts. Each builder takes colours and returns SVG. ----
    Hair is drawn in head space (head centre = 0,0, radius 70): "back" goes behind the face,
    "front" goes over the forehead. Curtains of hair that frame the face carry the classes
@@ -134,7 +138,41 @@ const HAIR_ART = {
     back: () => '',
     front: h => `<path d="M-68,-18 C-64,-70 -30,-76 0,-76 C30,-76 64,-70 68,-18 C42,-48 -42,-48 -68,-18 Z" fill="${h}" opacity=".6"/>`,
   },
+  // Shoulder-length waves with a side part (Alice). Needs a hex colour: the shading is made from it.
+  shoulderWaves: {
+    back: h => `<g fill="${tint(h, -0.06)}" ${SW(5)}>
+      <path d="M-84,10 C-94,-70 -46,-102 0,-102 C46,-102 94,-70 84,10 Z"/>
+      <path d="M-64,-52 C-98,-34 -108,-4 -98,22 C-92,40 -112,58 -104,82 C-98,102 -112,118 -94,132 C-80,142 -64,136 -58,124 C-50,110 -66,96 -60,78 C-54,60 -68,44 -62,22 Z"/>
+      <path d="M64,-52 C98,-34 110,-2 100,24 C94,42 114,60 106,84 C100,104 112,120 96,134 C82,144 66,138 60,126 C52,112 68,98 62,80 C56,62 70,46 64,24 Z"/>
+    </g>
+    <path d="M-88,-10 Q-98,10 -90,30 M-96,56 Q-90,76 -98,96 M-84,112 Q-78,124 -86,132 M88,-6 Q98,14 92,34 M98,62 Q92,82 100,100 M86,116 Q80,128 88,134" fill="none" stroke="${tint(h, 0.3)}" stroke-width="5" stroke-linecap="round"/>`,
+    front: h => `<path d="M-74,34 C-84,-12 -72,-62 -30,-86 C0,-100 42,-94 64,-68 C68.5,-62 71.75,-55 74,-47 L42,-38 C26,-52 2,-54 -16,-50 C-26,-46 -36,-38 -42,-26 C-54,-8 -58,16 -74,34 Z" fill="${h}" ${SW(5)}/>
+      <path d="M-16,-50 C-20,-66 -24,-78 -30,-86" fill="none" stroke="${tint(h, -0.28)}" stroke-width="4" stroke-linecap="round"/>
+      <path d="M20,-80 Q48,-70 56,-40 M-44,-70 Q-62,-50 -64,-16" fill="none" stroke="${tint(h, 0.3)}" stroke-width="5" stroke-linecap="round"/>
+      <g class="curtain-r"><path d="M74,-47 C80.75,-24.4 78.5,4.5 74,30 C64,8 60,-22 42,-38 Z" fill="${h}" ${SW(5)}/>
+        <path d="M62,-14 Q66,4 66,18" fill="none" stroke="${tint(h, 0.3)}" stroke-width="5" stroke-linecap="round"/></g>`,
+  },
+  // Long, straight and glossy, swept to one side (Kimberly). "behind" is drawn in body space, behind the body.
+  longStraight: {
+    behind: h => `<path d="M-84,-306 C-60,-350 60,-350 84,-306 L94,-120 L-94,-120 Z" fill="${tint(h, -0.19)}" ${SW(6)}/>`,
+    back: h => `<g fill="${tint(h, -0.19)}" ${SW(5)}>
+      <path d="M-82,10 C-92,-68 -46,-102 0,-102 C46,-102 92,-68 82,10 Z"/>
+      <path d="M-78,-6 C-92,60 -96,130 -86,196 L-50,200 C-56,140 -56,80 -60,30 Z"/>
+      <path d="M78,-6 C92,60 96,130 86,196 L50,200 C56,140 56,80 60,30 Z"/>
+    </g>
+    <path d="M-80,60 Q-84,120 -76,180 M80,50 Q84,120 76,180" fill="none" stroke="${tint(h, 0.14)}" stroke-width="5" stroke-linecap="round"/>`,
+    front: h => `<path d="M-60,-8 C-68,-52 -44,-88 -4,-92 C42,-96 80,-62 76,-8 L48,-12 C38,-38 12,-50 -18,-46 C-38,-42 -50,-28 -60,-8 Z" fill="${h}" ${SW(5)}/>
+      <path d="M-30,-80 Q4,-90 36,-74" fill="none" stroke="${tint(h, 0.14)}" stroke-width="5" stroke-linecap="round"/>
+      <g class="curtain-r"><path d="M76,-8 C74,24 70,54 72,88 L54,90 C52,54 56,16 48,-12 Z" fill="${h}" ${SW(5)}/>
+        <path d="M60,0 Q62,40 62,80" fill="none" stroke="${tint(h, 0.14)}" stroke-width="5" stroke-linecap="round"/></g>`,
+  },
   // Men only
+  // Swept back, two-tone (Jensen). Needs a hex colour: the shading is made from it.
+  swept: {
+    back: h => `<path d="M-78,6 C-88,-56 -48,-92 0,-92 C48,-92 88,-56 78,6 Z" fill="${tint(h, -0.15)}" ${SW(6)}/>`,
+    front: h => `<path d="M-70,-14 C-80,-52 -64,-84 -36,-96 C-20,-104 -4,-100 6,-110 C24,-122 54,-110 64,-90 C78,-68 76,-42 70,-20 C62,-40 50,-52 30,-54 C10,-56 -10,-52 -26,-46 C-44,-40 -60,-30 -70,-14 Z" fill="${h}" ${SW(5)}/>
+      <path d="M-52,-46 Q-46,-78 -16,-94 M-28,-50 Q-16,-82 16,-104 M2,-54 Q22,-82 48,-96 M34,-54 Q56,-66 64,-84" fill="none" stroke="${tint(h, -0.27)}" stroke-width="4" stroke-linecap="round"/>`,
+  },
   quiff: {
     back: h => `<path d="M-70,0 C-78,-60 -44,-88 0,-88 C44,-88 78,-60 70,0 Q64,-24 50,-34 L-50,-34 Q-64,-24 -70,0 Z" fill="${h}" ${SW(6)}/>`,
     front: h => `<path d="M-64,-28 C-62,-72 -20,-104 30,-98 C64,-94 76,-70 68,-34 C60,-58 40,-70 14,-68 C-20,-66 -46,-50 -64,-28 Z" fill="${h}" ${SW(5)}/>
@@ -155,7 +193,7 @@ const HAIR_ART = {
   },
 };
 
-// Outfits are drawn in body space (hip = 0,0). "sleeve" is the arm colour.
+// Outfits are drawn in body space (hip = 0,0). "sleeve" is the arm colour. svg gets (colour, look).
 const OUTFIT_ART = {
   laceTop: { // sheer black lace with wide bell sleeves (Gabi)
     sleeve: () => 'url(#lace)', top: () => 'url(#lace)',
@@ -176,6 +214,22 @@ const OUTFIT_ART = {
       <path d="M0,-150 L0,80" ${SW(5)}/>
       <circle cx="14" cy="-112" r="5" fill="${INK}"/><circle cx="14" cy="-66" r="5" fill="${INK}"/><circle cx="14" cy="-20" r="5" fill="${INK}"/>
       <path d="M-80,-60 h40 v26 h-40 Z" fill="${shade(c, -0.12)}" ${SW(4)}/>`,
+  },
+  buttonTop: { // scoop neck, button placket, small print (Alice)
+    sleeve: c => c,
+    svg: (c, m) => `<path d="M-50,-190 Q0,-104 50,-190 Z" fill="${m.skin}" ${SW(5)}/>
+      <path d="M0,-146 L0,80" stroke="${tint(c, -0.18)}" stroke-width="5" stroke-linecap="round"/>
+      <circle cx="0" cy="-118" r="5.5" fill="#E9ECF7" ${SW(3)}/><circle cx="0" cy="-72" r="5.5" fill="#E9ECF7" ${SW(3)}/>
+      <circle cx="0" cy="-26" r="5.5" fill="#E9ECF7" ${SW(3)}/><circle cx="0" cy="20" r="5.5" fill="#E9ECF7" ${SW(3)}/>
+      <path d="M-70,-120 q8,6 0,12 M-60,-40 q8,6 0,12 M66,-100 q-8,6 0,12 M58,-20 q-8,6 0,12" fill="none" stroke="${tint(c, -0.18)}" stroke-width="4" stroke-linecap="round"/>`,
+  },
+  coat: { // long coat with wide lapels over a black top (Kimberly)
+    sleeve: c => c,
+    svg: c => `<path d="M-28,-190 L0,-112 L28,-190 Z" fill="#221D2B" ${SW(5)}/>
+      <path d="M-50,-190 L-28,-190 L4,-104 L-14,-40 L-40,-110 L-66,-130 Z" fill="${tint(c, 0.7)}" ${SW(5)}/>
+      <path d="M50,-190 L28,-190 L-4,-104 L14,-40 L40,-110 L66,-130 Z" fill="${tint(c, 0.7)}" ${SW(5)}/>
+      <path d="M-14,-40 L-10,80 M14,-40 L10,80" fill="none" stroke="${tint(c, -0.11)}" stroke-width="5" stroke-linecap="round"/>
+      <path d="M-86,-60 L-46,-60 M86,-40 L50,-40" stroke="${tint(c, -0.11)}" stroke-width="5" stroke-linecap="round"/>`,
   },
   turtleneck: {
     sleeve: c => c,
@@ -201,6 +255,14 @@ const GUY_OUTFITS = {
   turtleneckJacket: c => ({ sleeve: '#3C3A44', top: '#3C3A44', svg: `<rect x="-32" y="-206" width="64" height="30" rx="12" fill="${c}" ${SW(4)}/>
       <path d="M-48,-190 L-14,-80 L-60,80 L-106,80 L-96,-142 Q-92,-184 -48,-190 Z" fill="#3C3A44" ${SW(5)}/>
       <path d="M48,-190 L14,-80 L60,80 L106,80 L96,-142 Q92,-184 48,-190 Z" fill="#3C3A44" ${SW(5)}/>` }),
+  biker: c => ({ sleeve: c, top: c, svg: `<path d="M-36,-190 L-28,80 L28,80 L36,-190 Z" fill="#17141D" ${SW(5)}/>
+      <path d="M-24,-190 Q0,-174 24,-190" fill="none" stroke="${c}" stroke-width="5" stroke-linecap="round"/>
+      <path d="M-32,-160 L-26,80 M32,-160 L26,80" stroke="#CFCBDA" stroke-width="7" stroke-dasharray="5 5"/>
+      <path d="M-52,-192 L-22,-194 L-38,-140 L-70,-158 Z" fill="${tint(c, 0.07)}" ${SW(5)}/>
+      <path d="M52,-192 L22,-194 L38,-140 L70,-158 Z" fill="${tint(c, 0.07)}" ${SW(5)}/>
+      <rect x="22" y="-4" width="14" height="24" rx="3" fill="#CFCBDA" ${SW(3)}/>
+      <path d="M-80,-120 Q-74,-50 -82,30 M80,-120 Q74,-50 82,30" fill="none" stroke="${tint(c, 0.15)}" stroke-width="7" stroke-linecap="round" opacity=".8"/>
+      <path d="M-64,-40 l10,-8 M-70,-6 l10,-8 M60,-60 l10,-8 M66,-20 l10,-8" stroke="${tint(c, -0.25)}" stroke-width="4" stroke-linecap="round"/>` }), // leather jacket over a black tee (Jensen)
   suede: () => ({ sleeve: '#A9744B', top: '#A9744B', svg: `<path d="M-30,-190 Q0,-170 30,-190" fill="none" ${SW(4)}/>
       <path d="M-100,60 L100,60" stroke="#8C5E3B" stroke-width="10"/><path d="M0,-180 L0,60" stroke="#8C5E3B" stroke-width="4"/>` }),
 };
@@ -210,12 +272,26 @@ const ROUND_GLASSES = col => `<g fill="#fff" fill-opacity=".2" stroke="${col}" s
   <circle cx="-26" cy="0" r="19"/><circle cx="26" cy="0" r="19"/><path d="M-7,-2 Q0,-7 7,-2" fill="none"/></g>`;
 const roundGlassesProfile = (d, col) => `<g fill="#fff" fill-opacity=".2" stroke="${col}" stroke-width="5">
   <circle cx="${30 * d}" cy="0" r="19"/><path d="M${11 * d},-2 L${-30 * d},-6" fill="none"/></g>`;
+const RECT_GLASSES = col => `<g fill="#fff" fill-opacity=".18" stroke="${col}" stroke-width="4" stroke-linejoin="round">
+  <rect x="-48" y="-14" width="42" height="28" rx="7"/><rect x="6" y="-14" width="42" height="28" rx="7"/>
+  <path d="M-6,-4 Q0,-8 6,-4 M-48,-6 L-66,-2 M48,-6 L66,-2" fill="none"/></g>`;
+const rectGlassesProfile = (d, col) => `<g fill="#fff" fill-opacity=".18" stroke="${col}" stroke-width="4" stroke-linejoin="round">
+  <rect x="${d > 0 ? 12 : -52}" y="-14" width="40" height="28" rx="7"/><path d="M${12 * d},-4 L${-30 * d},-6" fill="none"/></g>`;
 const MAKEUP = `<g fill="none" stroke="${INK}" stroke-linecap="round">
   <path d="M-33,-6 L-44,-12 M33,-6 L44,-12" stroke-width="4"/>
   <path d="M-30,-10 l-4,-6 M-24,-12 l-2,-7 M30,-10 l4,-6 M24,-12 l2,-7" stroke-width="2.5"/></g>`;
 const makeupProfile = d => `<path d="M${40 * d},-3 L${50 * d},-10" stroke="${INK}" stroke-width="4" stroke-linecap="round"/>`;
 const POUT = `<path d="M-9,34 Q-12,26 -4,27 Q0,24 4,27 Q12,26 9,34 Q6,44 0,44 Q-6,44 -9,34 Z" fill="#D9667F" ${SW(3.5)}/>
   <path d="M-6,34 Q0,36 6,34" fill="none" stroke="${INK}" stroke-width="2.5"/>`;
+// Sparkly drop earrings (Kimberly): on the left ear in front view (the hair covers the right one), on the ear in profile.
+const EARRING = (x, y) => `<g transform="translate(${x},${y})">
+    <circle r="4.5" fill="#F5F3FF" ${SW(2.5)}/>
+    <path d="M0,4 L0,12" stroke="#B9B6CC" stroke-width="2.5"/>
+    <path d="M0,12 l6,7 l-6,7 l-6,-7 Z" fill="#F5F3FF" ${SW(2.5)}/>
+    <path d="M0,26 L0,32" stroke="#B9B6CC" stroke-width="2.5"/>
+    <path d="M0,32 l5,6 l-5,8 l-5,-8 Z" fill="#DCEBFF" ${SW(2.5)}/>
+    <circle cx="-1.5" cy="17" r="1.5" fill="#fff"/>
+  </g>`;
 const LIP_SMILE = `<path d="M-17,32 Q0,47 17,32" fill="none" ${SW(5)}/><path d="M-10,37 Q0,43 10,37" fill="none" stroke="#D9667F" stroke-width="3" stroke-linecap="round"/>`;
 // Vix's resting "mean" face: heavy lids, brows that slope in, and a one-sided smirk.
 const meanLids = skin => `<g><path d="M-36,-17 L-16,-17 L-16,-4 Q-26,-7 -36,-4 Z M16,-17 L36,-17 L36,-4 Q26,-7 16,-4 Z" fill="${skin}"/>
@@ -240,16 +316,18 @@ function girlOpts(m, dir) {
   const outfit = OUTFIT_ART[m.outfit] || OUTFIT_ART.turtleneck;
   return {
     dir, skin: m.skin, top: outfit.top ? outfit.top(m.outfitColour) : m.outfitColour, sleeve: outfit.sleeve(m.outfitColour),
-    outfit: outfit.svg(m.outfitColour), hairBack: hair.back(m.hair), hairFront: hair.front(m.hair),
+    outfit: outfit.svg(m.outfitColour, m), hairBack: hair.back(m.hair), hairFront: hair.front(m.hair),
+    hairBehind: hair.behind ? hair.behind(m.hair) : '',
     smile: m.mouth === 'pout' ? POUT : m.mouth === 'smirk' ? SMIRK : (m.makeup ? LIP_SMILE : null),
     brows: m.mood === 'mean' ? MEAN_BROWS : null,
     eyeLids: m.mood === 'mean' ? meanLids(m.skin) : '',
-    faceExtra: (m.makeup ? MAKEUP : '') + (m.glasses ? ROUND_GLASSES(INK) : ''),
-    profileExtra: (m.makeup ? makeupProfile(dir) : '') + (m.glasses ? roundGlassesProfile(dir, INK) : ''),
+    faceExtra: (m.makeup ? MAKEUP : '') + (m.glasses ? ROUND_GLASSES(INK) : '') + (m.earrings ? EARRING(-74, 22) : ''),
+    profileExtra: (m.makeup ? makeupProfile(dir) : '') + (m.glasses ? roundGlassesProfile(dir, INK) : '') + (m.earrings ? EARRING(-26 * dir, 22) : ''),
   };
 }
 
-/* A random guy: white skin tones, varied hair, facial hair, glasses and outfit. */
+/* A random guy: white skin tones, varied hair, facial hair, glasses and outfit.
+   Named guys (GUY_CHARACTERS) use the same shape: { name, ...look }. */
 function randomGuy() {
   const outfitKey = pick(Object.keys(GUY_OUTFITS)), r = Math.random();
   return {
@@ -268,8 +346,8 @@ function guyOpts(g, dir) {
     hairBack: hair.back(g.hair), hairFront: hair.front(g.hair), head: MALE_HEAD(g.skin),
     brows: maleBrows(g.hair), profileBrow: maleBrowProfile(dir, g.hair),
     faceUnder: facial, profileUnder: facialP,
-    faceExtra: g.glasses ? ROUND_GLASSES(g.glasses) : '',
-    profileExtra: g.glasses ? roundGlassesProfile(dir, g.glasses) : '',
+    faceExtra: !g.glasses ? '' : g.glassesShape === 'rect' ? RECT_GLASSES(g.glasses) : ROUND_GLASSES(g.glasses),
+    profileExtra: !g.glasses ? '' : g.glassesShape === 'rect' ? rectGlassesProfile(dir, g.glasses) : roundGlassesProfile(dir, g.glasses),
   };
 }
 
