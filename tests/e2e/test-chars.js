@@ -1,6 +1,8 @@
 const { chromium, devices } = require('playwright');
 const path = require('path');
-const url = process.env.GAME_URL || ('file://' + path.resolve(__dirname, '../../index.html'));
+// Gabi and Vix live in the office story; these suites test it whatever the default story is.
+const url = process.env.GAME_URL || ('file://' + path.resolve(__dirname, '../../index.html') + '?story=office');
+const withQ = q => url + (url.includes('?') ? '&' : '?') + q;   // add a query to the game URL
 const shot = p => path.resolve(__dirname, 'shots', p);
 const ok = (c, m) => { console.log((c ? 'PASS ' : 'FAIL ') + m); if (!c) process.exitCode = 1; };
 const cards = page => page.$$eval('.pick-card', els => els.map(e => e.dataset.pick).join());
@@ -54,7 +56,7 @@ const cards = page => page.$$eval('.pick-card', els => els.map(e => e.dataset.pi
   ok(await page.evaluate(() => cast.pick) === 'gabi' && await page.textContent('#plateL') === 'Gabi', 'saved hidden pick falls back to the first visible character');
 
   // ?cast=all shows hidden characters; they can be picked, restored and played
-  await page.goto(url + '?cast=all'); await page.waitForTimeout(300);
+  await page.goto(withQ('cast=all')); await page.waitForTimeout(300);
   await page.click('#btnPlay');
   ok(await cards(page) === 'gabi,vix,kimberly,alice,custom', '?cast=all adds Kimberly and Alice before Make your own');
   await page.click('[data-pick="alice"]');
@@ -66,7 +68,7 @@ const cards = page => page.$$eval('.pick-card', els => els.map(e => e.dataset.pi
   await page.evaluate(() => { const g = window.__officeAffair.game; g.romance = 99.9; g.manager.enter('DISTRACTED', 999, {}); });
   await page.keyboard.down('Shift'); await page.waitForTimeout(200); await page.keyboard.up('Shift'); await page.waitForTimeout(2300);
   ok(await page.evaluate(() => window.__officeAffair.game.state) === 'WON' && (await page.textContent('#resultHead')).includes('Alice & '), 'she can win a round (memo: "Alice & <guy>")');
-  await page.goto(url + '?x=1&cast=all'); await page.waitForTimeout(300);
+  await page.goto(withQ('x=1&cast=all')); await page.waitForTimeout(300);
   ok(await page.evaluate(() => cast.pick) === 'alice' && !!(await page.$('[data-pick="alice"]')), '&cast=all works too');
   await page.goto(url); await page.waitForTimeout(300);
   ok(await page.evaluate(() => cast.pick) === 'gabi' && !(await page.$('[data-pick="alice"]')), 'without ?cast=all she is hidden again and Gabi is picked');
@@ -78,7 +80,7 @@ const cards = page => page.$$eval('.pick-card', els => els.map(e => e.dataset.pi
   }));
   ok(ng.ids === 'jensen' && ng.hidden && ng.shape, 'GUY_CHARACTERS has Jensen, hidden, with valid art ids');
   ok(ng.named === 0 && ng.jensen === 0, 'without ?cast=all Jensen is never tonight\'s guy');
-  await page.goto(url + '?cast=all'); await page.waitForTimeout(300);
+  await page.goto(withQ('cast=all')); await page.waitForTimeout(300);
   const ng2 = await page.evaluate(() => {
     const n = Array.from({ length: 400 }, () => cast.rollGuy().name).filter(n => n === 'Jensen').length;
     const g = GUY_CHARACTERS[0]; cast.guy = { id: g.id, name: g.name, ...g.look }; window.__officeAffair.renderer.buildChar('R');

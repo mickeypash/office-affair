@@ -100,10 +100,10 @@ To run them locally (optional):
 npm ci && npx playwright install chromium
 npm test                 # every suite
 node tests/run.js story  # one suite (test-story.js)
-GAME_URL=https://mickey.sh/office-affair/ npm test   # against the live site
+GAME_URL='https://mickey.sh/office-affair/?story=office' npm test   # against the live site
 ```
 
-Screenshots go to `tests/e2e/shots/` (not committed). The game itself still has no dependencies and no build step; `package.json` is for the tests only.
+Most suites test Gabi and Vix, so they open `index.html?story=office` by default; `test-story.js` tests the stories themselves. Screenshots go to `tests/e2e/shots/` (not committed). The game itself still has no dependencies and no build step; `package.json` is for the tests only.
 
 ## Publishing
 
