@@ -21,7 +21,7 @@ const cards = page => page.$$eval('.pick-card', els => els.map(e => e.dataset.pi
   }));
   ok(repo.shape, 'every CHARACTERS entry has id, name, hidden, look and notes');
   ok(repo.visible.join() === 'gabi,vix', 'visible characters are Gabi then Vix');
-  ok(repo.hidden.join() === 'alice,kimberly', 'Alice and Kimberly are hidden');
+  ok(repo.hidden.join() === 'kimberly,alice', 'Kimberly and Alice are hidden');
   ok(repo.playable.join() === 'gabi,vix' && repo.picks.join() === 'gabi,vix,custom', 'PLAYABLE and PICKS leave hidden characters out');
 
   // Old globals still match the new data
@@ -56,7 +56,7 @@ const cards = page => page.$$eval('.pick-card', els => els.map(e => e.dataset.pi
   // ?cast=all shows hidden characters; they can be picked, restored and played
   await page.goto(url + '?cast=all'); await page.waitForTimeout(300);
   await page.click('#btnPlay');
-  ok(await cards(page) === 'gabi,vix,alice,kimberly,custom', '?cast=all adds Alice and Kimberly before Make your own');
+  ok(await cards(page) === 'gabi,vix,kimberly,alice,custom', '?cast=all adds Kimberly and Alice before Make your own');
   await page.click('[data-pick="alice"]');
   ok(await page.getAttribute('[data-pick="alice"]', 'aria-checked') === 'true' && await page.textContent('#plateL') === 'Alice', 'hidden character can be picked with ?cast=all');
   await page.reload(); await page.waitForTimeout(300);
