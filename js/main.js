@@ -61,6 +61,9 @@ window.addEventListener('keyup', e => {
   if (e.key === 'Shift') player.release('key:shift');
 });
 
+// Any tap or key (re)starts the sound: mobile browsers only allow it from a user gesture.
+['touchend', 'click', 'keydown'].forEach(t => document.addEventListener(t, () => sfx.unlock(), { passive: true }));
+
 // Pointer on the stage and on the kiss button
 function bindHold(el, prefix) {
   el.addEventListener('pointerdown', e => {
