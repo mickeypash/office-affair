@@ -1,6 +1,7 @@
 'use strict';
 /* Boot, layout, input wiring and the main loop */
 if (STORY.poster && POSTERS[STORY.poster]) $('poster').innerHTML = POSTERS[STORY.poster];
+applyScene(); // the story's scene parts and palette, before the renderer looks up their ids
 const renderer = new Renderer();
 const game = new Game();
 ui.init();

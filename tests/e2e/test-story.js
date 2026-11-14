@@ -4,6 +4,17 @@ const url = process.env.GAME_URL || ('file://' + path.resolve(__dirname, '../../
 const ok = (c, m) => { console.log((c ? 'PASS ' : 'FAIL ') + m); if (!c) process.exitCode = 1; };
 const cards = page => page.$$eval('.pick-card', els => els.map(e => e.dataset.pick).join());
 const sep = url.includes('?') ? '&' : '?';
+// The parts of the office a story's scene can swap (js/scenes.js), and the wall colours.
+const sceneLook = page => page.evaluate(() => ({
+  rack: !!document.querySelector('#printer #printerBody #printerLight') && !document.querySelector('#printerBody rect[fill="#EEEAF6"]'),
+  printer: !!document.querySelector('#printerBody rect[fill="#EEEAF6"]'),
+  jamParts: ['jamText', 'jamPapers', 'jp0', 'jp1', 'jp2'].every(id => !!document.getElementById(id)),
+  jam: document.getElementById('jamText').textContent.trim(),
+  gpus: document.querySelectorAll('#wCups circle').length, cups: document.querySelectorAll('#wCups rect[fill="#C98A5E"]').length,
+  screen: document.getElementById('screenR').textContent.replace(/\s+/g, ' ').trim(),
+  wallpaper: document.querySelector('#wallpaper rect').getAttribute('fill'), carpet: document.querySelector('#carpet rect').getAttribute('fill'),
+  rail: document.getElementById('wallRail').getAttribute('fill'), trim: document.getElementById('wallTrim').getAttribute('fill'),
+}));
 (async () => {
   const b = await chromium.launch();
   const errs = [];
@@ -20,6 +31,22 @@ const sep = url.includes('?') ? '&' : '?';
   // No ?story: the default story (DEFAULT_STORY, today nvidia)
   ok(await page.evaluate(() => DEFAULT_STORY) === 'nvidia' && await page.evaluate(() => STORY.id) === 'nvidia', 'no ?story: the default story, nvidia');
   ok((await page.textContent('#poster')).includes('NVIDIA'), 'default poster is NVIDIA');
+  // Scene: a GPU rack for the printer, GPUs for the coffee tower, training on Jensen's screen, the story's palette
+  const sc = await sceneLook(page);
+  ok(sc.rack && !sc.printer && sc.jamParts, 'NVIDIA scene: a GPU rack replaces the printer and keeps the jam ids');
+  ok(sc.gpus >= 8 && sc.cups === 0, 'NVIDIA scene: the walker carries graphics cards, not coffee');
+  ok(sc.screen.includes('train_love.py') && sc.screen.includes('loss'), "NVIDIA scene: model training on Jensen's screen");
+  const pal = await page.evaluate(() => SCENE_PALETTES[STORY.scene.palette]);
+  ok(!!pal && sc.wallpaper !== '#F6DDA6' && sc.carpet !== '#8B9BD6' && sc.rail === pal.fills.wallRail && sc.trim === pal.fills.wallTrim, 'NVIDIA scene: the palette repaints walls, trim and carpet');
+  ok(await page.evaluate(() => Object.values(SCENE_PALETTES).every(p => p.wallpaper && p.carpet && ['wallBand', 'wallTrim', 'wallRail', 'wallPanel', 'wallBase'].every(k => p.fills[k]))), 'every palette paints every wall part');
+  // The rack's "jam" is an overheat
+  await page.evaluate(() => { const r = window.__officeAffair.renderer; r.decorT = 99; r.jamT = 1.6; });
+  await page.waitForTimeout(400);
+  const hot = await page.evaluate(() => ({ text: document.getElementById('jamText').textContent.trim(), shown: document.getElementById('jamText').style.display === 'inline',
+    flying: document.getElementById('jamPapers').style.display === 'inline' && !!document.getElementById('jp1').getAttribute('transform') }));
+  ok(hot.text === 'HOT!' && hot.shown && hot.flying, 'the rack overheats: "HOT!" (from the story copy) and puffs fly out');
+  await page.waitForTimeout(1600);
+  ok(await page.evaluate(() => document.getElementById('jamText').style.display === 'none' && document.getElementById('printerLight').getAttribute('fill') === '#8FE03C'), 'the overheat ends and the rack light turns green again');
   await page.click('#btnPlay');
   ok(await cards(page) === 'alice,kimberly,custom', 'default picker: Alice, Kimberly, Make your own');
   for (const q of ['story=nope', 'story=toString', 'story=__proto__', 'story=']) {
@@ -32,6 +59,11 @@ const sep = url.includes('?') ? '&' : '?';
   ok(await page.evaluate(() => STORY.id) === 'office', '?story=office selects the office');
   ok(await page.textContent('[data-copy="menu.howtoBoss"]') === 'Let go before the boss turns around.', 'office keeps the boss');
   ok((await page.textContent('#poster')).includes('ISABEL MARANT'), 'office poster');
+  const so = await sceneLook(page);
+  ok(so.printer && !so.rack && so.jam === 'JAM!', 'office scene: the printer, which jams');
+  ok(so.cups === 6 && so.gpus === 0, 'office scene: the walker carries the coffee tower');
+  ok(so.screen === '' && await page.$('#screenR rect[fill="#FFF4F7"]') !== null, "office scene: the guy's screen is unchanged");
+  ok(so.wallpaper === '#F6DDA6' && so.carpet === '#8B9BD6' && so.rail === '#E2B877' && so.trim === '#D9B06E', 'office scene: wallpaper, trim and carpet are unchanged');
   await page.click('#btnPlay');
   ok(await cards(page) === 'gabi,vix,custom', 'office picker: Gabi, Vix, Make your own');
 
